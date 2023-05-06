@@ -8,46 +8,42 @@ namespace mSTL {
 
 class alloc {
 private:
-	enum EAlign { ALIGN = 8 };                  // 小型区块的上调边界
-	enum EMaxBytes { MAXBYTES = 128 };          // 小型区块的上限，超过的区块由malloc分配
-	enum ENFreeLists {
-		NFREELISTS = (EMaxBytes::MAXBYTES / EAlign::ALIGN)
-	};                                          // free-lists 的个数
-	enum ENObjs { NOBJS = 20 };                 // 每次增加的节点数
+	enum { ALIGN = 8 };                  		// 每个链表的间隔，也是内存池块对齐边界
+	enum { MAX_BYTES = 128 };          			// 内存池块大小上限，超过该大小的区块由 malloc 分配 (16 * 8)
+	enum { NFREELISTS = MAX_BYTES / ALIGN };    // free-lists 结点的个数，每个结点为一个内存池，该内存池块大小逐个增加一个对齐单位
+	enum { NOBJS = 16 }; 						// 默认每次分配增加的节点数
+private:
+	// bytes 上调至 8 的倍数
+	static constexpr size_t RoundUp(size_t bytes) {
+		return ((bytes + ALIGN - 1) & ~(ALIGN - 1));
+	}
+	
 private:
 	// free-list 结点构造
 	union obj {
 		union obj* next;
-		char client[1];
 	};
 
-	static obj* free_list[ENFreeLists::NFREELISTS];
 private:
-	static char* start_free;                // 内存池起始位置
-	static char* end_free;                  // 内存池结束位置
-	static size_t heap_size;                // 堆大小
+	static char* start_free;                		// 预留内存空间起始位置
+	static char* end_free;                  		// 预留内存空间结束位置
+	static size_t heap_size;                        // 总计使用内存空间大小
+
+	static obj* free_list[NFREELISTS]; 				// 内存池数组，共组织 NFREELISTS 个不同大小内存池
 private:
-	// bytes 上调至 8 的倍数
-	constexpr static size_t ROUND_UP(size_t bytes) {
-		return ((bytes + EAlign::ALIGN - 1) & ~(EAlign::ALIGN - 1));
-	}
-
-	// 根据区块大小，决定使用第 n 号 freelist，n 从 0 开始计算
-	constexpr static size_t FREELIST_INDEX(size_t bytes) {
-		return (((bytes) + EAlign::ALIGN - 1) / EAlign::ALIGN - 1);
-	}
-
-	//返回一个大小为n的对象，并可能加入大小为n的其他区块到free-list
-	static void* refill(size_t n);
 	
-	//配置一大块空间，可容纳 nobjs 个大小为size的区块
-	//如果配置 nobjs 个区块有所不便，nobjs 可能会降低
-	static char* chunk_alloc(size_t size, size_t& nobjs);
+	// 根据区块大小，计算 freelists 编号 
+	static constexpr size_t FREELIST_INDEX(size_t bytes) {
+		return (((bytes) + ALIGN - 1) / ALIGN - 1);
+	}
+
+	static void* refill(size_t size); 								// 为链表分配内存并分割挂载
+	static char* chunk_alloc(size_t size, size_t& nobjs); 			// 为内存池分配一大块内存
 
 public:
-	static void* allocate(size_t bytes);
-	static void deallocate(void* ptr, size_t bytes);
-	static void* reallocate(void* ptr, size_t old_sz, size_t new_sz);
+	static void* allocate(size_t n);
+	static void deallocate(void* p, size_t n);
+	static void* reallocate(void* p, size_t old_n, size_t new_n);
 	
 };
 }

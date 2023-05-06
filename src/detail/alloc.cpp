@@ -1,138 +1,183 @@
 #include "../alloc.h"
+#include <cstddef>
 
 namespace mSTL {
 
-char* alloc::start_free = 0;
-char* alloc::end_free = 0;
+char* alloc::start_free = nullptr;
+char* alloc::end_free = nullptr;
 size_t alloc::heap_size = 0;
 
-alloc::obj* alloc::free_list[alloc::ENFreeLists::NFREELISTS] = {
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
+alloc::obj* alloc::free_list[alloc::NFREELISTS] = {
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
+    nullptr,
 };
 
-void* alloc::allocate(size_t bytes) {
-	if (bytes > EMaxBytes::MAXBYTES) {
-		return malloc(bytes);
-	}
-	size_t index = FREELIST_INDEX(bytes);
-	obj* list = free_list[index];
-	if (list) { //此list还有空间给我们
-		free_list[index] = list->next;
-		return list;
-	} else { //此list没有足够的空间，需要从内存池里面取空间
-		return refill(ROUND_UP(bytes));
-	}
-}
+// private
 
-void alloc::deallocate(void* ptr, size_t bytes) {
-	if (bytes > EMaxBytes::MAXBYTES) {
-		free(ptr);
-	} else {
-		size_t index = FREELIST_INDEX(bytes);
-		obj* node = static_cast<obj*>(ptr);
-		node->next = free_list[index];
-		free_list[index] = node;
-	}
-}
+void* alloc::refill(size_t size) {
 
-void* alloc::reallocate(void* ptr, size_t old_sz, size_t new_sz) {
-	deallocate(ptr, old_sz);
-	ptr = allocate(new_sz);
+	// 从此前预留空间里取
+	size_t nobjs = NOBJS;
+	char* chunk = chunk_alloc(size, nobjs);
 
-	return ptr;
-}
-
-// 返回一个大小为 n 的对象，并且有时候会为适当的 free list 增加节点
-// 假设 bytes 已经上调为 8 的倍数
-void* alloc::refill(size_t bytes) {
-	size_t nobjs = ENObjs::NOBJS;
-
-	// 从内存池里取
-	char* chunk = chunk_alloc(bytes, nobjs);
-	obj** my_free_list = 0;
-	obj* result = 0;
-	obj *current_obj = 0, *next_obj = 0;
-
-	if (nobjs == 1) { // 取出的空间只够一个对象使用
+	// 取出的空间刚好够一个对象使用
+	if (nobjs == 1) {
 		return chunk;
-	} else {
-		my_free_list = free_list + FREELIST_INDEX(bytes);
-		result = (obj*)(chunk);
-		*my_free_list = next_obj = (obj*)(chunk + bytes);
-		
-		// 将取出的多余的空间加入到相应的 free list 里面去
-		for (int i = 1;; ++i) {
-			current_obj = next_obj;
-			next_obj = (obj*)((char*)next_obj + bytes);
-			if (nobjs - 1 == i) {
-				current_obj->next = 0;
-				break;
-			} else {
-				current_obj->next = next_obj;
-			}
-		}
-		return result;
 	}
+
+	obj** my_free_list = free_list + FREELIST_INDEX(size);
+	obj* result = (obj*)(chunk);
+	obj* next_obj = *my_free_list = (obj*)(chunk + size);
+	obj* current_obj = nullptr;
+	int i;
+
+	// 将取出的多余的空间加入到相应的 free list 里面去
+	for (i = 1; i < nobjs - 1; i++) {
+		current_obj = next_obj;
+		next_obj = (obj*)((char*)next_obj + size);
+
+		current_obj->next = next_obj;
+	}
+
+	// 最后一个内存块
+	current_obj->next = nullptr;
+
+	return result;
+	
 }
 
-// 假设 bytes 已经上调为 8 的倍数
-char* alloc::chunk_alloc(size_t bytes, size_t& nobjs) {
-	char* result = 0;
-	size_t total_bytes = bytes * nobjs;
+char* alloc::chunk_alloc(size_t size, size_t& nobjs) {
+	char* result = nullptr;
+	size_t total_bytes = size * nobjs;
 	size_t bytes_left = end_free - start_free;
 
-	if (bytes_left >= total_bytes) { //内存池剩余空间完全满足需要
-		result = start_free;
-		start_free = start_free + total_bytes;
-		return result;
-	} else if (
-	    bytes_left >=
-	    bytes) { //内存池剩余空间不能完全满足需要，但足够供应一个或以上的区块
-		nobjs = bytes_left / bytes;
-		total_bytes = nobjs * bytes;
+	// 此前预留空间完全满足需要
+	// 分配默认数量个内存块至指定链表
+	if (bytes_left >= total_bytes) {
 		result = start_free;
 		start_free += total_bytes;
 		return result;
-	} else { //内存池剩余空间连一个区块的大小都无法提供
-		size_t bytes_to_get = 2 * total_bytes + ROUND_UP(heap_size >> 4);
+	}
+	// 此前预留空间不能完全满足需要
+	// 尽可能多的分配内存块
+	else if (bytes_left >= size) {
+		nobjs = bytes_left / size;
+		total_bytes = size * nobjs;
+		result = start_free;
+		start_free += total_bytes;
+		return result;
+	}
+	// 此前预留空间小于单个块空间
+	// 使用 malloc 重新分配内存
+	else {
+		// 将此前预留空间作为内存碎片挂载到对应链表中
 		if (bytes_left > 0) {
 			obj** my_free_list = free_list + FREELIST_INDEX(bytes_left);
 			((obj*)start_free)->next = *my_free_list;
 			*my_free_list = (obj*)start_free;
 		}
+
+		// 执行空间分配
+		// 2 * 当前需要空间 + ((总使用空间)/16,上调至 8 的倍数)
+		size_t bytes_to_get = 2 * total_bytes + RoundUp(heap_size >> 4);
 		start_free = (char*)malloc(bytes_to_get);
-		if (!start_free) {
-			obj **my_free_list = 0, *p = 0;
-			for (int i = 0; i <= EMaxBytes::MAXBYTES; i += EAlign::ALIGN) {
+
+		// 空间分配失败情况
+		if (start_free == nullptr) {
+			int i;
+			obj** my_free_list = nullptr;
+			obj* p = nullptr;
+
+			// 尝试从当前链表位置向后寻找最近的内存块并取出一个作为扩展空间
+			// 类似于在内存分块调度中的最优调度算法
+			for (i = size; i <= MAX_BYTES; i += ALIGN) {
 				my_free_list = free_list + FREELIST_INDEX(i);
 				p = *my_free_list;
-				if (p != 0) {
+
+				// 如果存在可用内存块，递归处理
+				if (p != nullptr) {
 					*my_free_list = p->next;
 					start_free = (char*)p;
 					end_free = start_free + i;
-					return chunk_alloc(bytes, nobjs);
+					return chunk_alloc(size, nobjs);
 				}
 			}
-			end_free = 0;
+
+			// 进行至此说明没有可分配的内存了
+			// 源码中尝试使用其他方法分配，此处直接抛出异常
+			// start_free = (char*)malloc_allocate(bytes_to_get);
+			throw "out of memory";
+			
+			// 此时 start_free 和 end_free 均应为 nullptr
+			end_free = nullptr;
 		}
+
+		// 执行至此说明保留内存空间已经完成扩充
+		// 递归调用处理
 		heap_size += bytes_to_get;
 		end_free = start_free + bytes_to_get;
-		return chunk_alloc(bytes, nobjs);
+		return chunk_alloc(size, nobjs);
 	}
 }
+
+// public
+
+void* alloc::allocate(size_t n) {
+
+	// 较大块直接使用 malloc 函数分配
+	if (n > (size_t)MAX_BYTES) 
+		return malloc(n);
+
+	// 计算获取分配块位置
+	obj** my_free_list = free_list + FREELIST_INDEX(n);
+	obj* result = *my_free_list;
+
+	if (result != nullptr) {
+		// 此时仍有空间，摘取当前头节点即可
+		*my_free_list = (*my_free_list)->next;
+		return result;
+	} else {
+		// 没有足够空间，内存池重新构造
+		return refill(RoundUp(n));
+	}
 }
+
+void alloc::deallocate(void* p, size_t n) {
+	// 大的块由于 malloc 直接分配，使用 free 释放即可
+	if (n > (size_t)MAX_BYTES) {
+		free(p);
+		return;
+	}
+
+	// 查找对应块链表
+	obj** my_free_list = free_list + FREELIST_INDEX(n);
+	obj* node = static_cast<obj*>(p);
+
+	// 将空块挂在链表头
+	node->next = *my_free_list;
+	*my_free_list = node;
+	
+}
+
+void* alloc::reallocate(void* p, size_t old_n, size_t new_n) {
+	deallocate(p, old_n);
+	p = allocate(new_n);
+
+	return p;
+}
+
+} // namespace mSTL
