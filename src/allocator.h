@@ -1,12 +1,12 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
+#include "basic.h"
 #include "alloc.h"
 #include <utility>
-#include <cassert>
 #include <new>
 
-namespace mSTL {
+MSTL_NAMESPACE_BEGIN
 
 // 空间配置
 template <class T>
@@ -92,6 +92,6 @@ void allocator<T>::destroy(pointer first, pointer last) {
 	}
 }
 
-} // namespace mSTL
+MSTL_NAMESPACE_END
 
 #endif

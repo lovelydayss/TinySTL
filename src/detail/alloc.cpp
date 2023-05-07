@@ -1,5 +1,4 @@
 #include "../alloc.h"
-#include <cstddef>
 
 namespace mSTL {
 
@@ -93,7 +92,7 @@ char* alloc::chunk_alloc(size_t size, size_t& nobjs) {
 
 		// 执行空间分配
 		// 2 * 当前需要空间 + ((总使用空间)/16,上调至 8 的倍数)
-		size_t bytes_to_get = 2 * total_bytes + RoundUp(heap_size >> 4);
+		const size_t bytes_to_get = 2 * total_bytes + RoundUp(heap_size >> 4);
 		start_free = (char*)malloc(bytes_to_get);
 
 		// 空间分配失败情况
@@ -139,7 +138,7 @@ char* alloc::chunk_alloc(size_t size, size_t& nobjs) {
 void* alloc::allocate(size_t n) {
 
 	// 较大块直接使用 malloc 函数分配
-	if (n > (size_t)MAX_BYTES) 
+	if (n > static_cast<size_t>(MAX_BYTES))
 		return malloc(n);
 
 	// 计算获取分配块位置
@@ -158,7 +157,7 @@ void* alloc::allocate(size_t n) {
 
 void alloc::deallocate(void* p, size_t n) {
 	// 大的块由于 malloc 直接分配，使用 free 释放即可
-	if (n > (size_t)MAX_BYTES) {
+	if (n > static_cast<size_t>(MAX_BYTES)) {
 		free(p);
 		return;
 	}

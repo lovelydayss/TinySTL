@@ -4,13 +4,12 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "allocator.h"
 #include "algorithm.h"
+#include "allocator.h"
 #include "iterator.h"
-#include "reverse_iterator.h"
 #include "uninitialized_functions.h"
 
-namespace mSTL {
+MSTL_NAMESPACE_BEGIN
 
 template <class T, class Alloc = allocator<T>>
 class vector {
@@ -20,11 +19,10 @@ private:
 	T* endOfStorage_;
 
 	typedef Alloc dataAllocator;
-public:
 
-	
+public:
 };
 
-}
+MSTL_NAMESPACE_END
 
 #endif

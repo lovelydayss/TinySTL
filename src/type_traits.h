@@ -1,7 +1,9 @@
 #ifndef TYPE_TRAITS_H
 #define TYPE_TRAITS_H
 
-namespace mSTL {
+#include "basic.h"
+
+MSTL_NAMESPACE_BEGIN
 
 namespace {
 	template <bool, class Ta, class Tb>
@@ -227,5 +229,6 @@ struct _type_traits<const signed char*> {
 	typedef _true_type is_POD_type;
 };
 
-} // namespace mSTL
+MSTL_NAMESPACE_END
+
 #endif

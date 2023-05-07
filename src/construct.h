@@ -1,10 +1,12 @@
 #ifndef CONSTRUCT_H
 #define CONSTRUCT_H
 
+
+#include "basic.h"
 #include "type_traits.h"
 #include <new>
 
-namespace mSTL {
+MSTL_NAMESPACE_BEGIN
 
 template <class T1, class T2>
 inline void construct(T1* ptr1, const T2& value) {
@@ -33,7 +35,8 @@ inline void destroy(ForwardIterator first, ForwardIterator last) {
 	typedef typename _type_traits<ForwardIterator>::is_POD_type is_POD_type;
 	_destroy(first, last, is_POD_type());
 }
-}
+
+MSTL_NAMESPACE_END
 
 
 #endif
