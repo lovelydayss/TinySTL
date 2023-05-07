@@ -1,20 +1,35 @@
-# TinySTL
+# mSTL
 
-线程安全的 C++ 标准模板库
+在 C++ STL 基础上参考 folly 等进行合理增减实现的 C++ 标准模板库
 
-## 功能描述
+## 支持功能
 
-* 使用 C++11 语法，基于模块化和泛型编程思想实现，保证线程安全
-* 合理增减内容，在实现基本组件的同时对一些标准库中未包含的容器和算法进行扩充
+| 功能/组件 | 路径                            | 完成情况 | 单元测试 | 性能对比 |
+| --------- | ------------------------------- | :-------: | :------: | :------: |
+| allocator | [src/allocator.h](src/allocator.h) | completed |  ......  |  ......  |
+| iterator  | [src/iterator.h](src/iterator.h)   | completed |  ......  |  ......  |
+| vector    | [src/vector.h](src/vector.h)       | completed |  ......  |  ......  |
+| algorithm | [src/algorithm.h](src/algorithm.h) |   to do   |  ......  |  ......  |
 
-* 项目代码经充分优化与测试，保证各组件性能与可靠性
+### 项目代码结构
 
-## 开发进度
 
+## 相关文档资料
+
+| 名称        | 简介                               | 路径                                  |
+| ----------- | ---------------------------------- | ------------------------------------- |
+| memory      | C++ 内存管理及 std::alloc 源码解析 | [doc/memory](doc/memory/memory.md)       |
+| iterator    | C++ 迭代器原理及源码解析           | [doc/iterator](doc/iterator/iterator.md) |
+| type_traits | C++ 类型萃取原理及应用             | doc/type_traits                       |
 
 ## 参考
 
+[cppreference](https://en.cppreference.com/w/)
+
 [TinySTL](https://github.com/zouxiaohang/TinySTL/tree/master/TinySTL)
 
+侯捷《STL 源码剖析》，《C++ Primer》...
 
 ## 更新记录
+
+**2023-5-7** 在写完 iterator 后重新整理了项目文档，姑且算作首次更新吧，接下来将完成 vector 功能模块   [git-commit](https://github.com/lovelydayss/mSTL/commit/5e332f85ee5d1d945539f4b8573431a74a81e10e)
