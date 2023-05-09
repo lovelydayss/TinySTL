@@ -1,13 +1,11 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <algorithm>
-#include <type_traits>
-
 #include "algorithm.h"
 #include "allocator.h"
 #include "iterator.h"
-#include "uninitialized_functions.h"
+#include "type_traits.h"
+
 
 MSTL_NAMESPACE_BEGIN
 

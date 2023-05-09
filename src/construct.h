@@ -10,6 +10,16 @@ MSTL_NAMESPACE_BEGIN
 
 // 迭代器
 
+template<class T1, class T2>
+inline void construct(T1 *ptr1, const T2& value){
+	new(ptr1) T1(value);
+}
+
+template<class T>
+inline void destroy(T *ptr){
+	ptr->~T();
+}
+
 template <class ForwardIterator>
 inline void _destroy(ForwardIterator first, ForwardIterator last, _true_type) {}
 

@@ -40,8 +40,8 @@ public:
 
 	// 调用析构函数执行对象析构
 	// 支持处理某一范围对象
-	static void destroy(pointer ptr);
-	static void destroy(pointer first, pointer last);
+	static void destroy(pointer ptr) noexcept;
+	static void destroy(pointer first, pointer last) noexcept;
 };
 
 template <class T>
@@ -82,11 +82,11 @@ void allocator<T>::construct(pointer ptr, Args&&... args) noexcept {
 }
 
 template <class T>
-void allocator<T>::destroy(pointer ptr) {
+void allocator<T>::destroy(pointer ptr) noexcept{
 	ptr->~T();
 }
 template <class T>
-void allocator<T>::destroy(pointer first, pointer last) {
+void allocator<T>::destroy(pointer first, pointer last) noexcept{
 	for (; first != last; first++) {
 		first->~T();
 	}

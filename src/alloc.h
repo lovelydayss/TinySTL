@@ -18,7 +18,7 @@ private:
 	enum { NOBJS = 16 }; // 默认每次分配增加的节点数
 private:
 	// bytes 上调至 8 的倍数
-	constexpr static size_t RoundUp(size_t bytes) {
+	static inline size_t RoundUp(size_t bytes) {
 		return ((bytes + ALIGN - 1) & ~(ALIGN - 1));
 	}
 
@@ -37,7 +37,7 @@ private:
 	    free_list[NFREELISTS]; // 内存池数组，共组织 NFREELISTS 个不同大小内存池
 private:
 	// 根据区块大小，计算 freelists 编号
-	constexpr static size_t FREELIST_INDEX(size_t bytes) {
+	static inline size_t FREELIST_INDEX(size_t bytes) {
 		return (((bytes) + ALIGN - 1) / ALIGN - 1);
 	}
 

@@ -1,18 +1,17 @@
 # mSTL
 
-在 C++ STL 基础上参考 folly 等进行合理增减实现的 C++ 标准模板库
+在 C++ STL 基础上参考 folly 等进行合理增减实现的 C++ 标准模板库，部分保证线程安全
 
 ## 支持功能
 
-| 功能/组件 | 路径                            | 完成情况 | 单元测试 | 性能对比 |
-| --------- | ------------------------------- | :-------: | :------: | :------: |
-| allocator | [src/allocator.h](src/allocator.h) | completed |  ......  |  ......  |
-| iterator  | [src/iterator.h](src/iterator.h)   | completed |  ......  |  ......  |
-| vector    | [src/vector.h](src/vector.h)       | completed |  ......  |  ......  |
-| algorithm | [src/algorithm.h](src/algorithm.h) |   to do   |  ......  |  ......  |
+| 功能/组件 | 路径                            | 完成情况 | 线程安全支持 | 单元测试 | 性能对比 |
+| --------- | ------------------------------- | :-------: | :----------: | :------: | :------: |
+| allocator | [src/allocator.h](src/allocator.h) | completed |    ......    |  ......  |  ......  |
+| iterator  | [src/iterator.h](src/iterator.h)   | completed |    ......    |  ......  |  ......  |
+| vector    | [src/vector.h](src/vector.h)       | completed |    ......    |  ......  |  ......  |
+| algorithm | [src/algorithm.h](src/algorithm.h) |   to do   |    ......    |  ......  |  ......  |
 
 ### 项目代码结构
-
 
 ## 相关文档资料
 
