@@ -4,22 +4,25 @@
 
 ## 支持功能
 
-| 功能/组件 | 路径                            | 完成情况 | 线程安全支持 | 单元测试 | 性能对比 |
-| --------- | ------------------------------- | :-------: | :----------: | :------: | :------: |
-| allocator | [src/allocator.h](src/allocator.h) | completed |    ......    |  ......  |  ......  |
-| iterator  | [src/iterator.h](src/iterator.h)   | completed |    ......    |  ......  |  ......  |
-| vector    | [src/vector.h](src/vector.h)       | completed |    ......    |  ......  |  ......  |
-| algorithm | [src/algorithm.h](src/algorithm.h) |   to do   |    ......    |  ......  |  ......  |
+| 功能/组件     | 路径                                    | 完成情况 | 线程安全支持 | 单元测试 | 性能对比 |
+| ------------- | --------------------------------------- | :-------: | :----------: | :------: | :------: |
+| allocator     | [src/allocator.h](src/allocator.h)         | completed |    ......    |  ......  |  ......  |
+| iterator      | [src/iterator.h](src/iterator.h)           | completed |    ......    |  ......  |  ......  |
+| vector        | [src/vector.h](src/vector.h)               | completed |    ......    |  ......  |  ......  |
+| construct     | [src/construct.h](src/construct.h)         | completed |    ......    |  ......  |  ......  |
+| uninitialized | [src/uninitialized.h](src/uninitialized.h) | completed |    ......    |  ......  |  ......  |
+| type_traits   | [src/type_traits.h](src/type_traits.h)     | completed |    ......    |  ......  |  ......  |
+| algorithm     | [src/algorithm.h](src/algorithm.h)         |   to do   |    ......    |  ......  |  ......  |
 
 ### 项目代码结构
 
 ## 相关文档资料
 
-| 名称        | 简介                               | 路径                                  |
-| ----------- | ---------------------------------- | ------------------------------------- |
-| memory      | C++ 内存管理及 std::alloc 源码解析 | [doc/memory](doc/memory/memory.md)       |
-| iterator    | C++ 迭代器原理及源码解析           | [doc/iterator](doc/iterator/iterator.md) |
-| type_traits | C++ 类型萃取原理及应用             | doc/type_traits                       |
+| 名称        | 简介                               | 路径                                           |
+| ----------- | ---------------------------------- | ---------------------------------------------- |
+| memory      | C++ 内存管理及 std::alloc 源码解析 | [doc/memory](doc/memory/memory.md)                |
+| iterator    | C++ 迭代器原理及源码解析           | [doc/iterator](doc/iterator/iterator.md)          |
+| type_traits | C++ 类型萃取原理及应用             | [doc/type_traits](doc/type_traits/type_traits.md) |
 
 ## 参考
 
