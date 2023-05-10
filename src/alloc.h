@@ -15,7 +15,7 @@ private:
 	enum {
 		NFREELISTS = MAX_BYTES / ALIGN
 	}; // free-lists 结点的个数，每个结点为一个内存池，该内存池块大小逐个增加一个对齐单位
-	enum { NOBJS = 16 }; // 默认每次分配增加的节点数
+	enum { NOBJS = 20 }; // 默认每次分配增加的节点数
 private:
 	// bytes 上调至 8 的倍数
 	static inline size_t RoundUp(size_t bytes) {
