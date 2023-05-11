@@ -8,7 +8,7 @@
 | ------------- | --------------------------------------- | :-------: | :----------: | :------: | :------: |
 | allocator     | [src/allocator.h](src/allocator.h)         | completed |    ......    |  ......  |  ......  |
 | iterator      | [src/iterator.h](src/iterator.h)           | completed |    ......    |  ......  |  ......  |
-| vector        | [src/vector.h](src/vector.h)               | completed |    ......    |  ......  |  ......  |
+| vector        | [src/vector.h](src/vector.h)               |   to do   |    ......    |  ......  |  ......  |
 | construct     | [src/construct.h](src/construct.h)         | completed |    ......    |  ......  |  ......  |
 | uninitialized | [src/uninitialized.h](src/uninitialized.h) | completed |    ......    |  ......  |  ......  |
 | type_traits   | [src/type_traits.h](src/type_traits.h)     | completed |    ......    |  ......  |  ......  |

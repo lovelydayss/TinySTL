@@ -13,10 +13,10 @@
 MSTL_NAMESPACE_BEGIN
 
 ///<- copy series
-// copy(): [first,last) -> [result,result + (last - first))  O(N)
-// copy_n(): [first,last) -> [result,result + n)  O(N)
-// copy_if(): [first,last) -> [result,result + (last - first)) (just condition is true)  O(N)
-// copy_backward(): [first,last) -> [result - (last - first), result)  O(N)
+// copy(): [first, last) -> [result, result + (last - first))  O(N)
+// copy_n(): [first, last) -> [result, result + n)  O(N)
+// copy_if(): [first, last) -> [result, result + (last - first)) (just condition is true)  O(N)
+// copy_backward(): [first, last) -> [result - (last - first), result)  O(N)
 
 //----------------- copy -------------------
 template <class InputIterator, class OutputIterator>
@@ -64,6 +64,30 @@ BidirectionalIterator2 copy_backward(BidirectionalIterator1 first,
                                      BidirectionalIterator2 result) {
 	while (last != first)
 		*(--result) = *(--last);
+	return result;
+}
+
+///<- move series
+// copy(): [first, last) -> [result, result + (last - first))  O(N)
+// copy_backward(): [first, last) -> [result - (last - first), result)  O(N)
+//-------------------- move ----------------------
+template< class InputIterator, class OutputIterator >
+OutputIterator move(InputIterator first, InputIterator last, OutputIterator result) {
+	while (first != last) {
+		*result = std::move(*first);
+		++result;
+		++first;
+	}
+	return result;
+}
+
+//-------------- move_backward -------------------
+template <class BidirIterator1, class BidirIterator2>
+BidirIterator2 move_backward(BidirIterator1 first, BidirIterator1 last, BidirIterator2 result) {
+
+	while (first != last)
+		*(result) = std::move(*(--last));
+
 	return result;
 }
 

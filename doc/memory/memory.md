@@ -45,7 +45,7 @@ std::vector<int, __gnu_cxx::__pool_alloc<int>> result;
 
 ### uninitialized_copy()
 
-`ininitialized_copy()` 将 `[first,last)` 表示的源迭代器区间的所有对象拷贝到以 `result` 为起始地址的目的区间。如果源迭代器 `is POD type` ，直接执行内存复制，而若是 `is not POD type`，则 `uninitialized_copy()` 会调用 `construct()` 为每个输入对象进行构造
+ `uninitialized_copy()` 将 `[first,last)` 表示的源迭代器区间的所有对象拷贝到以 `result` 为起始地址的目的区间。如果源迭代器 `is POD type` ，直接执行内存复制，而若是 `is not POD type`，则 `uninitialized_copy()` 会调用 `construct()` 为每个输入对象进行构造
 
 容器的全区间构造函数（range constructor）通常以两个步骤完成：
 
@@ -115,9 +115,9 @@ ForwardIterator _uninitialized_copy_aux(InputIterator first,
 
 ### uninitialized_fill()
 
-`uininitialized_fill()` 将 `value`填充到 `[first,last)` 表示的目的区间。如果源迭代器 `is POD type` ，直接执行内存复制函数，而若是 `is not POD type`，则 `uninitialized_fill()` 会调用 `construct()` 为每个输入对象进行构造
+`uninitialized_fill()` 将 `value`填充到 `[first,last)` 表示的目的区间。如果源迭代器 `is POD type` ，直接执行内存复制函数，而若是 `is not POD type`，则 `uninitialized_fill()` 会调用 `construct()` 为每个输入对象进行构造
 
-与 `uninitialized_copy()` 一样，`uininitialized_fill()` 必须具有 commit or rollback 语义，即要么“构造出所有必要元素”，要么 “不构造任何东西”（当有任何一个对象构造失败时必须执行回滚）
+与 `uninitialized_copy()` 一样，`unininitialized_fill()` 必须具有 commit or rollback 语义，即要么“构造出所有必要元素”，要么 “不构造任何东西”（当有任何一个对象构造失败时必须执行回滚）
 
 ```c++
 
@@ -173,9 +173,9 @@ void uninitialized_fill(ForwardIterator first,
 
 ### uninitialized_fill_n()
 
-`uininitialized_fill_n()` 函数是 `uininitialized_fill()` 函数的区间长度参数版本，其采用 `(first, n)`（迭代器起始位置，长度）的形式替代迭代器区间。（此处仍进行了实现，不过似乎可以重构为转换为迭代器后对 `uininitialized_fill()` 函数进行调用）
+`uninitialized_fill_n()` 函数是 `uninitialized_fill()` 函数的区间长度参数版本，其采用 `(first, n)`（迭代器起始位置，长度）的形式替代迭代器区间。（此处仍进行了实现，不过似乎可以重构为转换为迭代器后对 `uninitialized_fill()` 函数进行调用）
 
-与上述两个函数一样，`uininitialized_fill_n()` 必须具有 commit or rollback 语义，即要么“构造出所有必要元素”，要么 “不构造任何东西”（当有任何一个对象构造失败时必须执行回滚）。
+与上述两个函数一样，`uninitialized_fill_n()` 必须具有 commit or rollback 语义，即要么“构造出所有必要元素”，要么 “不构造任何东西”（当有任何一个对象构造失败时必须执行回滚）。
 
 ```c++
 
@@ -237,6 +237,5 @@ uninitialized_fill_n(ForwardIterator first, Size n, const T& x) {
 [SGI STL内存基本处理工具：uninitialized_copy/uninitialized_fill/uninitialized_fill_n ](https://www.cnblogs.com/fortunely/p/16223417.html)
 
 [SGI STL空间配置器 allocator/alloc](https://www.cnblogs.com/fortunely/p/16219743.html)
-
 
 &nbsp;

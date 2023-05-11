@@ -1,10 +1,10 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
 
-#include "basic.h"
 #include "alloc.h"
-#include <utility>
+#include "basic.h"
 #include <new>
+#include <utility>
 
 MSTL_NAMESPACE_BEGIN
 
@@ -12,13 +12,13 @@ MSTL_NAMESPACE_BEGIN
 template <class T>
 class allocator {
 public:
-	typedef T value_type;
-	typedef T* pointer;
+	typedef T             value_type;
+	typedef T*            pointer;
 	typedef const pointer const_pointer;
-	typedef T& reference;
-	typedef const T& const_reference;
-	typedef size_t size_type;
-	typedef ptrdiff_t difference_type;
+	typedef T&            reference;
+	typedef const T&      const_reference;
+	typedef size_t        size_type;
+	typedef ptrdiff_t     difference_type;
 
 public:
 	// 调用 alloc 类函数执行空间分配
@@ -34,9 +34,9 @@ public:
 	static void construct(pointer ptr);
 	static void construct(pointer ptr, const_reference value);
 
-	static void construct(pointer ptr, T&& value) noexcept;
-	template<class... Args>
-	void construct(pointer ptr, Args&&... args) noexcept;
+	// static void construct(pointer ptr, T&& value) noexcept;
+	template <class... Args>
+	static void construct(pointer ptr, Args&&... args) noexcept;
 
 	// 调用析构函数执行对象析构
 	// 支持处理某一范围对象
@@ -50,7 +50,8 @@ T* allocator<T>::allocate() {
 }
 template <class T>
 T* allocator<T>::allocate(size_t n) {
-	return n == 0 ? nullptr : static_cast<pointer>(alloc::allocate(sizeof(T) * n));
+	return n == 0 ? nullptr
+	              : static_cast<pointer>(alloc::allocate(sizeof(T) * n));
 }
 template <class T>
 void allocator<T>::deallocate(pointer ptr) {
@@ -67,14 +68,17 @@ template <class T>
 void allocator<T>::construct(pointer ptr) {
 	new (ptr) T();
 }
+
 template <class T>
 void allocator<T>::construct(pointer ptr, const_reference value) {
 	new (ptr) T(value);
 }
+/*
 template <class T>
 void allocator<T>::construct(pointer ptr, T&& value) noexcept {
-	new (ptr) T(std::move(value));
+	new (ptr) T(std::forward<T>(value));
 }
+*/
 template <class T>
 template <class... Args>
 void allocator<T>::construct(pointer ptr, Args&&... args) noexcept {
@@ -82,13 +86,14 @@ void allocator<T>::construct(pointer ptr, Args&&... args) noexcept {
 }
 
 template <class T>
-void allocator<T>::destroy(pointer ptr) noexcept{
+void allocator<T>::destroy(pointer ptr) noexcept {
 	ptr->~T();
 }
 template <class T>
-void allocator<T>::destroy(pointer first, pointer last) noexcept{
-	for (; first != last; first++) {
+void allocator<T>::destroy(pointer first, pointer last) noexcept {
+	while (first != last) {
 		first->~T();
+		first++;
 	}
 }
 
