@@ -361,17 +361,17 @@ inline void advance(InputIterator& i, Distance n) {
 template <class Iterator>
 class _reverse_iterator {
 public:
-	typedef Iterator iterator_type;
-	typedef _reverse_iterator<Iterator> self;
+	using iterator_type = Iterator;
+	using self = _reverse_iterator<Iterator>;
 
-	typedef typename iterator_traits<Iterator>::iterator_category iterator_category;
-	typedef typename iterator_traits<Iterator>::value_type value_type;
-	typedef typename iterator_traits<Iterator>::difference_type difference_type;
-	typedef typename iterator_traits<Iterator>::pointer pointer;
-	typedef typename iterator_traits<Iterator>::reference reference;
+	using iterator_category = typename iterator_traits<Iterator>::iterator_category;
+	using value_type = typename iterator_traits<Iterator>::value_type;
+	using difference_type =  typename iterator_traits<Iterator>::difference_type;
+	using pointer = typename iterator_traits<Iterator>::pointer;
+	using reference = typename iterator_traits<Iterator>::reference;
 
-	typedef const pointer const_pointer;
-	typedef const reference const_reference;
+	using const_pointer = const pointer;
+	using const_reference = const reference;
 
 protected:
 	Iterator current_;

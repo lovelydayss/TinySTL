@@ -4,15 +4,16 @@
 
 ## 支持功能
 
-| 功能/组件     | 路径                                    | 完成情况 | 线程安全支持 | 单元测试 | 性能对比 |
-| ------------- | --------------------------------------- | :-------: | :----------: | :------: | :------: |
-| allocator     | [src/allocator.h](src/allocator.h)         | completed |    ......    |  ......  |  ......  |
-| iterator      | [src/iterator.h](src/iterator.h)           | completed |    ......    |  ......  |  ......  |
-| vector        | [src/vector.h](src/vector.h)               |   to do   |    ......    |  ......  |  ......  |
-| construct     | [src/construct.h](src/construct.h)         | completed |    ......    |  ......  |  ......  |
-| uninitialized | [src/uninitialized.h](src/uninitialized.h) | completed |    ......    |  ......  |  ......  |
-| type_traits   | [src/type_traits.h](src/type_traits.h)     | completed |    ......    |  ......  |  ......  |
-| algorithm     | [src/algorithm.h](src/algorithm.h)         |   to do   |    ......    |  ......  |  ......  |
+| 功能/组件        | 路径                                          | 完成情况 | 线程安全支持 | 单元测试 | 性能对比 |
+| ---------------- | --------------------------------------------- | :-------: | :----------: | :------: | :------: |
+| allocator        | [src/allocator.h](src/allocator.h)               | completed |    ......    |  ......  |  ......  |
+| iterator         | [src/iterator.h](src/iterator.h)                 | completed |    ......    |  ......  |  ......  |
+| vector           | [src/vector.h](src/vector.h)                     |   to do   |    ......    |  ......  |  ......  |
+| construct        | [src/construct.h](src/construct.h)               | completed |    ......    |  ......  |  ......  |
+| uninitialized    | [src/uninitialized.h](src/uninitialized.h)       | completed |    ......    |  ......  |  ......  |
+| type_traits      | [src/type_traits.h](src/type_traits.h)           | completed |    ......    |  ......  |  ......  |
+| algorithm        | [src/algorithm.h](src/algorithm.h)               |   to do   |    ......    |  ......  |  ......  |
+| initializer_list | [src/initializer_list.h](src/initializer_list.h) |   to do   |    ......    |  ......  |  ......  |
 
 ### 项目代码结构
 

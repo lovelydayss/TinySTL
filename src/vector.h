@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <cstddef>
 #include <limits>
 
 #include "algorithm.h"
@@ -12,23 +13,26 @@
 
 MSTL_NAMESPACE_BEGIN
 
-template <class T, class Alloc = allocator<T>>
+template <class T, class Allocator = allocator<T>>
 class vector {
+private:
+	enum { EXPANSION_FACTOR = 1.5 };
+
 public:
-	typedef T                 value_type;
-	typedef Alloc         	  allocator_type;
-	typedef size_t            size_type;
-	typedef ptrdiff_t         difference_type;
-	typedef value_type&       reference;
-	typedef const value_type& const_reference;
-	typedef value_type*       pointer;
-	typedef const value_type* const_pointer;
+	using value_type = T;
+	using allocator_type = Allocator;
+	using size_type = size_t;
+	using difference_type = ptrdiff_t;
+	using reference = value_type& ;
+	using const_reference = const value_type&;
+	using pointer = value_type*;
+	using const_pointer = const value_type*;
 
-	typedef _iterator<random_access_iterator_tag, value_type> iterator;
-	typedef _iterator<random_access_iterator_tag, const value_type> const_iterator;
+	using iterator = _iterator<random_access_iterator_tag, value_type>;
+	using const_iterator = _iterator<random_access_iterator_tag, const value_type>;
 
-	typedef _reverse_iterator<iterator>       reverse_iterator;
-	typedef _reverse_iterator<const_iterator> const_reverse_iterator;
+	using reverse_iterator = _reverse_iterator<iterator>;
+	using const_reverse_iterator = _reverse_iterator<const_iterator>;
 
 private:
 	pointer start_;
@@ -47,7 +51,7 @@ public:
 	
 	
 	explicit vector(const size_type count);
-	explicit vector(const size_type count, const value_type& value = T(), const allocator_type& alloc = allocator_type());
+	explicit vector(const size_type count, const value_type& value = value_type(), const allocator_type& alloc = allocator_type());
 
 	template <class InputIterator>
 	vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
@@ -117,9 +121,11 @@ public:
 	// Modifiers
 
 	void clear() noexcept;
-	iterator insert(const_iterator pos, const value_type& value);
-	iterator insert(const_iterator pos, T&& value);
+	iterator insert(const_iterator pos, const_reference value);
+	iterator insert(const_iterator pos, value_type&& value);
 	iterator insert(const_iterator pos, size_type count, const_reference value);
+	iterator insert(const_iterator pos, size_type count, value_type&& value);
+	
 	template <class InputIterator>
 	iterator insert(const_iterator pos, InputIterator first, InputIterator last);
 	// iterator insert(const_iterator pos, initializer_list<T> ilist);
@@ -131,7 +137,7 @@ public:
 	iterator erase(const_iterator first, const_iterator last);
 
 	void push_back(const_reference value);
-	void push_back(T&& value);
+	void push_back(value_type&& value);
 
 	template <class... Args>
 	reference emplace_back(Args&&... args);
@@ -144,17 +150,15 @@ public:
 	void swap(vector& other);
 
 private:
+	
 	template <class InputIterator>
 	void insert_aux(iterator      position,
 	                InputIterator first,
 	                InputIterator last,
 	                std::false_type);
 	template <class Integer>
-	void insert_aux(iterator          position,
-	                Integer           n,
-	                const value_type& value,
+	void insert_aux(iterator position, Integer n, const value_type& value,
 	                std::true_type);
-
 };
 
 template <class T, class Alloc>

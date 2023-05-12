@@ -33,8 +33,9 @@ inline void _destroy(ForwardIterator first, ForwardIterator last, _true_type) no
 // 调用对应析构函数执行对象析构
 template <class ForwardIterator>
 inline void _destroy(ForwardIterator first, ForwardIterator last, _false_type) noexcept {
-	for (; first != last; ++first) {
+	while (first != last) {
 		destroy(&*first);
+		++first;
 	}
 }
 

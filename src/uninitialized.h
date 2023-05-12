@@ -1,12 +1,13 @@
 #ifndef UNINITIALIZED_H
 #define UNINITIALIZED_H
 
-#include "algorithm.h"
-#include "allocator.h"
 #include "basic.h"
 #include "construct.h"
+
+#include "algorithm.h"
 #include "iterator.h"
 #include "type_traits.h"
+
 #include <cstring>
 #include <exception>
 

@@ -1,5 +1,4 @@
 #include "../vector.h"
-#include <cstddef>
 
 MSTL_NAMESPACE_BEGIN
 
@@ -12,16 +11,15 @@ MSTL_NAMESPACE_BEGIN
 //----------------- construct -------------------
 template <class T, class Alloc>
 vector<T, Alloc>::vector(const size_type count) {
-	vector(count, T(), allocator_type());
+	vector(count, value_type(), allocator_type());
 }
 
 template <class T, class Alloc>
 vector<T, Alloc>::vector(const size_type count, const value_type& value,
                          const allocator_type& alloc) {
 	start_ = alloc::allocate(count);
-	finish_ = uninitialized_fill_n(begin(), count, value);
+	finish_ = mSTL::uninitialized_fill_n(begin(), count, value);
 	end_of_storage_ = finish_;
-	
 }
 
 template <class T, class Alloc>
@@ -29,7 +27,7 @@ template <class InputIterator>
 vector<T, Alloc>::vector(InputIterator first, InputIterator last,
                          const allocator_type& alloc) {
 	start_ = alloc::allocate((last - first));
-	finish_ = uninitialized_copy(first, last);
+	finish_ = mSTL::uninitialized_copy(first, last);
 	end_of_storage_ = finish_;
 }
 
@@ -54,24 +52,24 @@ vector<T, Alloc>::vector(vector&& other) {
 template <class T, class Alloc>
 vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& other) {
 
-	if (*this == other)
+	if (this == &other)
 		return *this;
 
-	destroy(begin(), end());
+	mSTL::destroy(begin(), end());
 	reserve(other.capacity());
-	finish_ = uninitialized_copy(other.begin(), other.end(), begin());
+	finish_ = mSTL::uninitialized_copy(other.begin(), other.end(), begin());
 
 	return *this; 
 }
 
 template <class T, class Alloc>
 vector<T, Alloc>& vector<T, Alloc>::operator=(vector&& other) {
-	if (*this == other)
+	if (this == &other)
 		return *this;
 
-	destroy(begin(), end());
+	mSTL::destroy(begin(), end());
 	reserve(other.capacity());
-	finish_ = uninitialized_move(other.begin(), other.end(), begin()); // 执行移动
+	finish_ = mSTL::uninitialized_move(other.begin(), other.end(), begin()); // 执行移动
 
 	return *this;
 }
@@ -84,16 +82,16 @@ vector<T, Alloc>& vector<T, Alloc>::operator=(initializer_list<T> ilist) {}
 template <class T, class Alloc>
 void vector<T, Alloc>::assign(size_type count, const T& value) {
 	reserve(count);
-	destroy(begin(), end());
-	finish_ = uninitialized_fill_n(begin(), count, value);
+	mSTL::destroy(begin(), end());
+	finish_ = mSTL::uninitialized_fill_n(begin(), count, value);
 }
 
 template <class T, class Alloc>
 template <class InputIterator>
 void vector<T, Alloc>::assign(InputIterator first, InputIterator last) {
 	reserve((last - first));
-	destroy(begin(), end());
-	finish_ = uninitialized_copy(first, last, begin());
+	mSTL::destroy(begin(), end());
+	finish_ = mSTL::uninitialized_copy(first, last, begin());
 }
 
 /*
@@ -103,7 +101,7 @@ void vector<T, Alloc>::assign(initializer_list<T> ilist) {}
 
 template <class T, class Alloc>
 vector<T, Alloc>::~vector() noexcept {
-	destroy(begin(), end());
+	mSTL::destroy(start_, finish_);
 	allocator_type::deallocate(start_, capacity());
 }
 
@@ -117,12 +115,12 @@ void vector<T, Alloc>::reserve(size_type n) {
 	if (n <= old_capacity_)
 		return;
 
-	auto old_start_ = start_;
-	auto old_finish_ = finish_;
+	pointer old_start_ = start_;
+	pointer old_finish_ = finish_;
 
 	// 新内存块制作及数据移动
 	start_ = allocator_type::allocate(n);
-	finish_ = uninitialized_move(old_start_, old_finish_, start_);
+	finish_ = mSTL::uninitialized_move(old_start_, old_finish_, start_);
 	end_of_storage_ = start_ + n;
 
 	// 释放此前的内存块
@@ -135,12 +133,12 @@ void vector<T, Alloc>::shrink_to_fit() {
 	size_type old_size = size();
 	size_type old_capacity_ = capacity();
 
-	auto old_start_ = start_;
-	auto old_finish_ = finish_;
+	pointer old_start_ = start_;
+	pointer old_finish_ = finish_;
 
 	// 新内存块制作及数据移动
 	start_ = allocator_type::allocate(old_size);
-	finish_ = uninitialized_move(old_start_, old_finish_, start_);
+	finish_ = mSTL::uninitialized_move(old_start_, old_finish_, start_);
 	end_of_storage_ = finish_;
 
 	// 释放此前的内存块
@@ -148,32 +146,114 @@ void vector<T, Alloc>::shrink_to_fit() {
 }
 
 //<- Modifiers
+template <class T, class Alloc>
+void vector<T, Alloc>::clear() noexcept {
+	mSTL::destroy(begin(), end());
+	finish_ = start_;
+}
 
-void     clear() noexcept;
-iterator insert(const_iterator pos, const value_type& value);
-iterator insert(const_iterator pos, T&& value);
-iterator insert(const_iterator pos, size_type count, const_reference value);
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, const_reference value) {
+	const auto index = pos - start_;
+	insert(pos, 1, value);
+	return (start_ + index);
+}
+
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, value_type&& value) {
+	const auto index = pos - start_;
+	insert(pos, 1, std::move(value));
+	return (start_ + index);
+}
+
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator
+vector<T, Alloc>::insert(const_iterator pos, size_type count,
+                         const_reference value) {
+	
+}
+
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, size_type count, value_type&& value){}
+
+template <class T, class Alloc>
 template <class InputIterator>
-iterator insert(const_iterator pos, InputIterator first, InputIterator last);
-// iterator insert(const_iterator pos, initializer_list<T> ilist);
+typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, InputIterator first, InputIterator last){}
+// typename  vector<T, Alloc>::iterator insert(const_iterator pos, initializer_list<T> ilist){}
 
+template <class T, class Alloc>
 template <class... Args>
-iterator emplace(const_iterator pos, Args&&... args);
+typename vector<T, Alloc>::iterator vector<T, Alloc>::emplace(const_iterator pos, Args&&... args) {
+	
+}
 
-iterator erase(const_iterator position);
-iterator erase(const_iterator first, const_iterator last);
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(const_iterator position) {
+	earse(position, (position + 1));
+}
 
-void push_back(const_reference value);
-void push_back(T&& value);
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator vector<T, Alloc>::erase(const_iterator first, const_iterator last){}
 
+template <class T, class Alloc>
+void vector<T, Alloc>::push_back(const_reference value) {
+	insert(end(), 1, value);
+}
+
+template <class T, class Alloc>
+void vector<T, Alloc>::push_back(value_type&& value) {
+	insert(end(), 1, std::move(value));
+}
+
+template <class T, class Alloc>
 template <class... Args>
-reference emplace_back(Args&&... args);
+typename vector<T, Alloc>::reference vector<T, Alloc>::emplace_back(Args&&... args) {
+	emplace(end(), std::forward<Args>(args)...);
+}
 
-void pop_back();
+template <class T, class Alloc>
+void vector<T, Alloc>::pop_back() {
+	--finish_;
+	mSTL::destroy(finish_);
+}
 
-void resize(size_type count);
-void resize(size_type count, const value_type& value);
+template <class T, class Alloc>
+void vector<T, Alloc>::resize(size_type count) {
+	resize(count, value_type());
+}
 
-void swap(vector& other);
+template <class T, class Alloc>
+void vector<T, Alloc>::resize(size_type count, const_reference value) {
+	size_type size_ = size();
+	size_type capacity_ = capacity();
+
+	pointer   new_finish_ = start_ + count;
+
+	if (count <= size_) {
+		mSTL::destroy(new_finish_, finish_);
+		finish_ = new_finish_;
+	}
+
+	else if (count > size_ && count <= capacity_) {
+		mSTL::uninitialized_fill_n(finish_, (count - size_), value);
+	}
+
+	else if (count > capacity_) {
+		reserve(static_cast<size_type>(capacity_ * EXPANSION_FACTOR));
+		mSTL::uninitialized_fill_n(finish_, new_finish_, value);
+	}
+}
+
+template <class T, class Alloc>
+void vector<T, Alloc>::swap(vector& other) {
+	if (this == &other)
+		return;
+
+	mSTL::swap(start_, other.start_);
+	mSTL::swap(finish_, other.finish_);
+	mSTL::swap(end_of_storage_, end_of_storage_);
+
+}
+
 
 MSTL_NAMESPACE_END
