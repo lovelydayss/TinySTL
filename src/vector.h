@@ -55,19 +55,20 @@ public:
 
 	template <class InputIterator>
 	vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
-
-	// vector(initializer_list<T> init, const allocator_type& alloc = allocator_type());
+	
+	vector(initializer_list<T> il, const allocator_type& alloc = allocator_type());
 
 	vector(const vector& other);
 	vector(vector&& other);
 	vector& operator=(const vector& other);
 	vector& operator=(vector&& other);
-	// vector& operator=(initializer_list<T> ilist);
+	vector& operator=(initializer_list<T> il);
 
 	void assign(size_type count, const T& value);
 	template <class InputIterator>
 	void assign(InputIterator first, InputIterator last);
-	// void assign(initializer_list<T> ilist);
+	
+	void assign(initializer_list<T> il);
 
 	~vector() noexcept;
 
@@ -128,7 +129,7 @@ public:
 	
 	template <class InputIterator>
 	iterator insert(const_iterator pos, InputIterator first, InputIterator last);
-	// iterator insert(const_iterator pos, initializer_list<T> ilist);
+	iterator insert(const_iterator pos, initializer_list<T> il);
 
 	template <class... Args>
 	iterator emplace(const_iterator pos, Args&&... args);
@@ -150,7 +151,7 @@ public:
 	void swap(vector& other);
 
 private:
-	
+	size_type get_new_capacity(size_type len) const;
 	template <class InputIterator>
 	void insert_aux(iterator      position,
 	                InputIterator first,

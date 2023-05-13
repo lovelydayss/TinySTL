@@ -13,7 +13,8 @@
 | uninitialized    | [src/uninitialized.h](src/uninitialized.h)       | completed |    ......    |  ......  |  ......  |
 | type_traits      | [src/type_traits.h](src/type_traits.h)           | completed |    ......    |  ......  |  ......  |
 | algorithm        | [src/algorithm.h](src/algorithm.h)               |   to do   |    ......    |  ......  |  ......  |
-| initializer_list | [src/initializer_list.h](src/initializer_list.h) |   to do   |    ......    |  ......  |  ......  |
+| initializer_list | [src/initializer_list.h](src/initializer_list.h) | completed |    ......    |  ......  |  ......  |
+| array            | [src/array.h](src/array.h)                       |   to do   |    ......    |  ......  |  ......  |
 
 ### 项目代码结构
 
@@ -24,6 +25,7 @@
 | memory      | C++ 内存管理及 std::alloc 源码解析 | [doc/memory](doc/memory/memory.md)                |
 | iterator    | C++ 迭代器原理及源码解析           | [doc/iterator](doc/iterator/iterator.md)          |
 | type_traits | C++ 类型萃取原理及应用             | [doc/type_traits](doc/type_traits/type_traits.md) |
+| vector      | vector/array/initializer_list 文档 | [doc/vector](doc/vector/vector.md)                |
 
 ## 参考
 

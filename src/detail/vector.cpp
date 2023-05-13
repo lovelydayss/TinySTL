@@ -31,13 +31,12 @@ vector<T, Alloc>::vector(InputIterator first, InputIterator last,
 	end_of_storage_ = finish_;
 }
 
-/*
 template <class T, class Alloc>
-vector<T, Alloc>::vector(initializer_list<T> init,
-                        const allocator_type& alloc) {
-	
+vector<T, Alloc>::vector(initializer_list<T> il, const allocator_type& alloc) {
+	start_ = alloc::allocate(il.size());
+	finish_ = mSTL::uninitialized_copy(il.begin(), il.end());
+	end_of_storage_ = finish_;
 }
-*/
 
 template <class T, class Alloc>
 vector<T, Alloc>::vector(const vector& other) {
@@ -74,10 +73,12 @@ vector<T, Alloc>& vector<T, Alloc>::operator=(vector&& other) {
 	return *this;
 }
 
-/*
+
 template <class T, class Alloc>
-vector<T, Alloc>& vector<T, Alloc>::operator=(initializer_list<T> ilist) {}
-*/
+vector<T, Alloc>& vector<T, Alloc>::operator=(initializer_list<T> il) {
+
+}
+
 
 template <class T, class Alloc>
 void vector<T, Alloc>::assign(size_type count, const T& value) {
@@ -94,10 +95,12 @@ void vector<T, Alloc>::assign(InputIterator first, InputIterator last) {
 	finish_ = mSTL::uninitialized_copy(first, last, begin());
 }
 
-/*
+
 template <class T, class Alloc>
-void vector<T, Alloc>::assign(initializer_list<T> ilist) {}
-*/
+void vector<T, Alloc>::assign(initializer_list<T> il) {
+
+}
+
 
 template <class T, class Alloc>
 vector<T, Alloc>::~vector() noexcept {
@@ -179,7 +182,9 @@ typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos,
 template <class T, class Alloc>
 template <class InputIterator>
 typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, InputIterator first, InputIterator last){}
-// typename  vector<T, Alloc>::iterator insert(const_iterator pos, initializer_list<T> ilist){}
+
+template <class T, class Alloc>
+typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, initializer_list<T> il) {}
 
 template <class T, class Alloc>
 template <class... Args>
@@ -255,5 +260,9 @@ void vector<T, Alloc>::swap(vector& other) {
 
 }
 
+template <class T, class Alloc>
+typename vector<T, Alloc>::size_type vector<T, Alloc>::get_new_capacity(size_type len) const {
+	
+}
 
 MSTL_NAMESPACE_END
