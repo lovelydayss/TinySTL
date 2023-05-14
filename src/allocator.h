@@ -25,11 +25,11 @@ public:
 public:
 	// 调用 alloc 类函数执行空间分配
 	static pointer allocate();
-	static pointer allocate(size_t n);
+	static pointer allocate(size_type n);
 
 	// 调用 alloc 类函数执行空间释放
 	static void deallocate(pointer ptr);
-	static void deallocate(pointer ptr, size_t n);
+	static void deallocate(pointer ptr, size_type n);
 
 	// 调用类型的构造函数进行对象构造
 	// 支持右值对象及可变参数构造
@@ -58,7 +58,7 @@ typename allocator<T>::pointer allocator<T>::allocate() {
 	return static_cast<pointer>(alloc::allocate(sizeof(T)));
 }
 template <class T>
-typename allocator<T>::pointer allocator<T>::allocate(size_t n) {
+typename allocator<T>::pointer allocator<T>::allocate(size_type n) {
 	return n == 0 ? nullptr
 	              : static_cast<pointer>(alloc::allocate(sizeof(T) * n));
 }
@@ -67,7 +67,7 @@ void allocator<T>::deallocate(pointer ptr) {
 	alloc::deallocate(static_cast<void*>(ptr), sizeof(T));
 }
 template <class T>
-void allocator<T>::deallocate(pointer ptr, size_t n) {
+void allocator<T>::deallocate(pointer ptr, size_type n) {
 	if (n == 0)
 		return;
 	alloc::deallocate(static_cast<void*>(ptr), sizeof(T) * n);
@@ -95,17 +95,6 @@ void allocator<T>::construct(pointer ptr, Args&&... args) noexcept {
 }
 
 template <class T>
-void allocator<T>::destroy(pointer ptr) noexcept {
-	typedef typename _type_traits<pointer>::is_POD_type is_POD_type;
-	_destroy(ptr, is_POD_type());
-}
-template <class T>
-void allocator<T>::destroy(pointer first, pointer last) noexcept {
-	typedef typename _type_traits<pointer>::is_POD_type is_POD_type;
-	_destroy(first, last, is_POD_type());
-}
-
-template <class T>
 void allocator<T>::_destory(pointer ptr, _true_type) noexcept {}
 
 template <class T>
@@ -121,6 +110,17 @@ void allocator<T>::_destory(pointer first, pointer last, _false_type) noexcept {
 		destroy(first);
 		++first;
 	}
+}
+
+template <class T>
+void allocator<T>::destroy(pointer ptr) noexcept {
+	typedef typename _type_traits<pointer>::is_POD_type is_POD_type;
+	allocator<T>::_destory(ptr, is_POD_type());
+}
+template <class T>
+void allocator<T>::destroy(pointer first, pointer last) noexcept {
+	typedef typename _type_traits<pointer>::is_POD_type is_POD_type;
+	allocator<T>::_destory(first, last, is_POD_type());
 }
 
 MSTL_NAMESPACE_END
