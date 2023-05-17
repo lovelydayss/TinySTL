@@ -9,7 +9,8 @@
 #include "iterator.h"
 #include "type_traits.h"
 #include "uninitialized.h"
-#include "initializer_list.h"
+
+#include <initializer_list>
 
 MSTL_NAMESPACE_BEGIN
 
@@ -34,6 +35,7 @@ public:
 	using reverse_iterator = _reverse_iterator<iterator>;
 	using const_reverse_iterator = _reverse_iterator<const_iterator>;
 
+	using uninitialized_mem_func_type = uninitialized_mem_func<T, Allocator>;
 private:
 	pointer start_;
 	pointer finish_;
@@ -56,19 +58,19 @@ public:
 	template <class InputIterator>
 	vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
 	
-	vector(initializer_list<T> il, const allocator_type& alloc = allocator_type());
+	vector(std::initializer_list<T> il, const allocator_type& alloc = allocator_type());
 
 	vector(const vector& other);
 	vector(vector&& other);
 	vector& operator=(const vector& other);
 	vector& operator=(vector&& other);
-	vector& operator=(initializer_list<T> il);
+	vector& operator=(std::initializer_list<T> il);
 
 	void assign(size_type count, const T& value);
 	template <class InputIterator>
 	void assign(InputIterator first, InputIterator last);
 	
-	void assign(initializer_list<T> il);
+	void assign(std::initializer_list<T> il);
 
 	~vector() noexcept;
 
@@ -129,7 +131,7 @@ public:
 	
 	template <class InputIterator>
 	iterator insert(const_iterator pos, InputIterator first, InputIterator last);
-	iterator insert(const_iterator pos, initializer_list<T> il);
+	iterator insert(const_iterator pos, std::initializer_list<T> il);
 
 	template <class... Args>
 	iterator emplace(const_iterator pos, Args&&... args);

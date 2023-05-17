@@ -17,8 +17,8 @@ vector<T, Alloc>::vector(const size_type count) {
 template <class T, class Alloc>
 vector<T, Alloc>::vector(const size_type count, const value_type& value,
                          const allocator_type& alloc) {
-	start_ = alloc::allocate(count);
-	finish_ = mSTL::uninitialized_fill_n(begin(), count, value);
+	start_ = allocator_type::allocate(count);
+	finish_ = uninitialized_mem_func_type::fill_n(begin(), count, value);
 	end_of_storage_ = finish_;
 }
 
@@ -26,15 +26,15 @@ template <class T, class Alloc>
 template <class InputIterator>
 vector<T, Alloc>::vector(InputIterator first, InputIterator last,
                          const allocator_type& alloc) {
-	start_ = alloc::allocate((last - first));
-	finish_ = mSTL::uninitialized_copy(first, last);
+	start_ = allocator_type::allocate((last - first));
+	finish_ = uninitialized_mem_func_type::copy(first, last);
 	end_of_storage_ = finish_;
 }
 
 template <class T, class Alloc>
-vector<T, Alloc>::vector(initializer_list<T> il, const allocator_type& alloc) {
-	start_ = alloc::allocate(il.size());
-	finish_ = mSTL::uninitialized_copy(il.begin(), il.end());
+vector<T, Alloc>::vector(std::initializer_list<T> il, const allocator_type& alloc) {
+	start_ = allocator_type::allocate(il.size());
+	finish_ = uninitialized_mem_func_type::copy(il.begin(), il.end());
 	end_of_storage_ = finish_;
 }
 
@@ -54,9 +54,9 @@ vector<T, Alloc>& vector<T, Alloc>::operator=(const vector& other) {
 	if (this == &other)
 		return *this;
 
-	mSTL::destroy(begin(), end());
+	allocator_type::destroy(begin(), end());
 	reserve(other.capacity());
-	finish_ = mSTL::uninitialized_copy(other.begin(), other.end(), begin());
+	finish_ = uninitialized_mem_func_type::copy(other.begin(), other.end(), begin());
 
 	return *this; 
 }
@@ -66,16 +66,16 @@ vector<T, Alloc>& vector<T, Alloc>::operator=(vector&& other) {
 	if (this == &other)
 		return *this;
 
-	mSTL::destroy(begin(), end());
+	allocator_type::destroy(begin(), end());
 	reserve(other.capacity());
-	finish_ = mSTL::uninitialized_move(other.begin(), other.end(), begin()); // 执行移动
+	finish_ = uninitialized_mem_func_type::move(other.begin(), other.end(), begin()); // 执行移动
 
 	return *this;
 }
 
 
 template <class T, class Alloc>
-vector<T, Alloc>& vector<T, Alloc>::operator=(initializer_list<T> il) {
+vector<T, Alloc>& vector<T, Alloc>::operator=(std::initializer_list<T> il) {
 
 }
 
@@ -83,28 +83,28 @@ vector<T, Alloc>& vector<T, Alloc>::operator=(initializer_list<T> il) {
 template <class T, class Alloc>
 void vector<T, Alloc>::assign(size_type count, const T& value) {
 	reserve(count);
-	mSTL::destroy(begin(), end());
-	finish_ = mSTL::uninitialized_fill_n(begin(), count, value);
+	allocator_type::destroy(begin(), end());
+	finish_ = uninitialized_mem_func_type::fill_n(begin(), count, value);
 }
 
 template <class T, class Alloc>
 template <class InputIterator>
 void vector<T, Alloc>::assign(InputIterator first, InputIterator last) {
 	reserve((last - first));
-	mSTL::destroy(begin(), end());
-	finish_ = mSTL::uninitialized_copy(first, last, begin());
+	allocator_type::destroy(begin(), end());
+	finish_ = uninitialized_mem_func_type::copy(first, last, begin());
 }
 
 
 template <class T, class Alloc>
-void vector<T, Alloc>::assign(initializer_list<T> il) {
+void vector<T, Alloc>::assign(std::initializer_list<T> il) {
 
 }
 
 
 template <class T, class Alloc>
 vector<T, Alloc>::~vector() noexcept {
-	mSTL::destroy(start_, finish_);
+	allocator_type::destroy(start_, finish_);
 	allocator_type::deallocate(start_, capacity());
 }
 
@@ -123,7 +123,7 @@ void vector<T, Alloc>::reserve(size_type n) {
 
 	// 新内存块制作及数据移动
 	start_ = allocator_type::allocate(n);
-	finish_ = mSTL::uninitialized_move(old_start_, old_finish_, start_);
+	finish_ =  uninitialized_mem_func_type::move(old_start_, old_finish_, start_);
 	end_of_storage_ = start_ + n;
 
 	// 释放此前的内存块
@@ -141,7 +141,7 @@ void vector<T, Alloc>::shrink_to_fit() {
 
 	// 新内存块制作及数据移动
 	start_ = allocator_type::allocate(old_size);
-	finish_ = mSTL::uninitialized_move(old_start_, old_finish_, start_);
+	finish_ = uninitialized_mem_func_type::move(old_start_, old_finish_, start_);
 	end_of_storage_ = finish_;
 
 	// 释放此前的内存块
@@ -151,7 +151,7 @@ void vector<T, Alloc>::shrink_to_fit() {
 //<- Modifiers
 template <class T, class Alloc>
 void vector<T, Alloc>::clear() noexcept {
-	mSTL::destroy(begin(), end());
+	allocator_type::destroy(begin(), end());
 	finish_ = start_;
 }
 
@@ -184,7 +184,7 @@ template <class InputIterator>
 typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, InputIterator first, InputIterator last){}
 
 template <class T, class Alloc>
-typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, initializer_list<T> il) {}
+typename vector<T, Alloc>::iterator vector<T, Alloc>::insert(const_iterator pos, std::initializer_list<T> il) {}
 
 template <class T, class Alloc>
 template <class... Args>
@@ -219,7 +219,7 @@ typename vector<T, Alloc>::reference vector<T, Alloc>::emplace_back(Args&&... ar
 template <class T, class Alloc>
 void vector<T, Alloc>::pop_back() {
 	--finish_;
-	mSTL::destroy(finish_);
+	allocator_type::destroy(finish_);
 }
 
 template <class T, class Alloc>
@@ -235,17 +235,17 @@ void vector<T, Alloc>::resize(size_type count, const_reference value) {
 	pointer   new_finish_ = start_ + count;
 
 	if (count <= size_) {
-		mSTL::destroy(new_finish_, finish_);
+		allocator_type::destroy(new_finish_, finish_);
 		finish_ = new_finish_;
 	}
 
 	else if (count > size_ && count <= capacity_) {
-		mSTL::uninitialized_fill_n(finish_, (count - size_), value);
+		uninitialized_mem_func_type::fill_n(finish_, (count - size_), value);
 	}
 
 	else if (count > capacity_) {
 		reserve(static_cast<size_type>(capacity_ * EXPANSION_FACTOR));
-		mSTL::uninitialized_fill_n(finish_, new_finish_, value);
+		uninitialized_mem_func_type::fill_n(finish_, new_finish_, value);
 	}
 }
 

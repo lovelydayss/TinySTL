@@ -7,7 +7,6 @@
 
 MSTL_NAMESPACE_BEGIN
 
-// initializer_list
 template <class T, class Allocator = mSTL::allocator<T>>
 class initializer_list {
 public:
@@ -24,14 +23,15 @@ private:
 	pointer first_;
 	pointer last_;
 
-public:
-	initializer_list() noexcept = default;
+private:
 	initializer_list(const_pointer first, const_pointer last) noexcept
 	    : first_(first)
 	    , last_(last) {}
 
+public:
+	initializer_list() noexcept = default;
 	template <class... Args>
-	initializer_list(Args... args) {
+	constexpr initializer_list(Args... args) {
 		size_type size = static_cast<size_type>(sizeof...(args));
 		size_type count = 0;
 
@@ -44,11 +44,11 @@ public:
 	initializer_list(const initializer_list<T>& other) = delete;
 	initializer_list<T>& operator=(const initializer_list<T>& other) = delete;
 
-	size_t size() const noexcept {
+	constexpr size_t size() const noexcept {
 		return static_cast<size_type>(last_ - first_);
 	}
-	const_pointer begin() const noexcept { return first_; }
-	const_pointer end() const noexcept { return last_; }
+	constexpr const_pointer begin() const noexcept { return first_; }
+	constexpr const_pointer end() const noexcept { return last_; }
 
 	~initializer_list() {
 		allocator_type::destroy(first_, last_);

@@ -2,9 +2,10 @@
 #define UNINITIALIZED_H
 
 #include "basic.h"
+
+#include "allocator.h"
 #include "construct.h"
 
-#include "algorithm.h"
 #include "iterator.h"
 #include "type_traits.h"
 
@@ -12,6 +13,9 @@
 #include <exception>
 
 MSTL_NAMESPACE_BEGIN
+
+
+// allocator 无关 uninitialized_mem_func
 
 // is POD type
 // 执行内存拷贝操作即可
@@ -94,7 +98,7 @@ ForwardIterator uninitialized_move(InputIterator first, InputIterator last,
 	typedef typename _type_traits<
 	    typename iterator_traits<InputIterator>::value_type>::is_POD_type
 	    isPODType;
-	return _uninitialized_copy_aux(first, last, result, isPODType());
+	return _uninitialized_move_aux(first, last, result, isPODType());
 }
 
 // is POD type

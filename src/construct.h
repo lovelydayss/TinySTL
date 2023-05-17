@@ -10,6 +10,7 @@ MSTL_NAMESPACE_BEGIN
 
 // 未初始化空间的处理
 // 不依赖于 allocator
+// 在修改 uninitialized 函数后失去作用 
 
 // 对象构造
 template<class T1, class T2>
