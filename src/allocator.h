@@ -85,7 +85,7 @@ void allocator<T>::construct(pointer ptr, const_reference value) {
 
 template <class T>
 void allocator<T>::construct(pointer ptr, value_type&& value) noexcept {
-	new (ptr) T(std::forward<T>(value));
+	new (ptr) T(std::move(value));
 }
 
 template <class T>

@@ -6,11 +6,13 @@
 
 #include "algorithm.h"
 #include "allocator.h"
+#include "construct.h"
 #include "iterator.h"
 #include "type_traits.h"
 #include "uninitialized.h"
 
 #include <initializer_list>
+#include <utility>
 
 MSTL_NAMESPACE_BEGIN
 
@@ -42,35 +44,36 @@ private:
 	pointer end_of_storage_;
 
 public:
-	
 	// (construct)(destruct)(copy)(operator=)(assign) ......
+	// 暂不支持构造函数中自定义 alloc 进行分配，均采用类型默认 allocator 
 	
 	vector() = default;
-	explicit vector(const allocator_type& alloc = allocator_type())
+
+	/*explicit vector(const allocator_type& alloc = allocator_type())
 	    : start_(nullptr)
 	    , finish_(nullptr)
 	    , end_of_storage_(nullptr) {}
-	
+	*/
 	
 	explicit vector(const size_type count);
-	explicit vector(const size_type count, const value_type& value = value_type(), const allocator_type& alloc = allocator_type());
+	explicit vector(const size_type count, const_reference value = value_type(), const allocator_type& alloc = allocator_type());
 
 	template <class InputIterator>
 	vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
 	
-	vector(std::initializer_list<T> il, const allocator_type& alloc = allocator_type());
+	vector(const std::initializer_list<T>& il, const allocator_type& alloc = allocator_type());
 
 	vector(const vector& other);
 	vector(vector&& other);
 	vector& operator=(const vector& other);
 	vector& operator=(vector&& other);
-	vector& operator=(std::initializer_list<T> il);
+	vector& operator=(const std::initializer_list<T>& il);
 
-	void assign(size_type count, const T& value);
+	void assign(size_type count, const_reference value);
 	template <class InputIterator>
 	void assign(InputIterator first, InputIterator last);
 	
-	void assign(std::initializer_list<T> il);
+	void assign(const std::initializer_list<T>& il);
 
 	~vector() noexcept;
 
@@ -93,7 +96,7 @@ public:
 	pointer data() noexcept { return (start_); }
 	const_pointer data() const noexcept { return (start_); }
 
-	// Iterators ?
+	// Iterators
 
 	iterator begin() noexcept { return (start_); }
 	const_iterator begin() const noexcept { return (start_); }
@@ -115,81 +118,200 @@ public:
 
 	bool empty() const noexcept { return start_ == finish_; }
 	size_type size() const noexcept { return static_cast<size_type>(finish_ - start_); }
-	// size_type max_size() const noexcept { return std::numeric_limits<difference_type>::max(); }
+	size_type max_size() const noexcept { return std::numeric_limits<difference_type>::max(); }
+
+	size_type capacity() const noexcept { return static_cast<size_type>(end_of_storage_ - start_); }
 
 	void reserve(size_type n);
-	size_type capacity() const noexcept { return static_cast<size_type>(end_of_storage_ - start_); }
 	void shrink_to_fit();
 
 	// Modifiers
 
-	void clear() noexcept;
-	iterator insert(const_iterator pos, const_reference value);
-	iterator insert(const_iterator pos, value_type&& value);
-	iterator insert(const_iterator pos, size_type count, const_reference value);
-	iterator insert(const_iterator pos, size_type count, value_type&& value);
-	
+	void clear() noexcept {
+		allocator_type::destroy(begin(), end());
+		finish_ = start_;
+	}
+	iterator insert(const_iterator pos, const_reference value) {
+		return insert(pos, 1, value);
+	}
+	iterator insert(const_iterator pos, value_type&& value) {
+		const size_type index = pos - begin();
+
+		make_empty_in_pos(pos, 1);
+		allocator_type::construct(pos, std::move(value));
+
+		return (begin() + index);
+	}
+	iterator insert(const_iterator pos, size_type count, const_reference value){
+		const size_type index = pos - begin();
+
+		make_empty_in_pos(pos, count);
+		uninitialized_mem_func_type::fill_n(pos, count, value);
+
+		return (begin() + index);
+	}
 	template <class InputIterator>
-	iterator insert(const_iterator pos, InputIterator first, InputIterator last);
-	iterator insert(const_iterator pos, std::initializer_list<T> il);
+	iterator insert(const_iterator pos, InputIterator first, InputIterator last){
+		const size_type index = pos - begin();
+
+		make_empty_in_pos(pos, static_cast<size_type>(last - first));
+		uninitialized_mem_func_type::copy(first, last, pos);
+
+		return (begin() + index);
+	}
+	iterator insert(const_iterator pos, const std::initializer_list<T>& il) {
+		return insert(pos, il.begin(), il.end());
+	}
 
 	template <class... Args>
-	iterator emplace(const_iterator pos, Args&&... args);
+	iterator emplace(const_iterator pos, Args&&... args) {
+		const size_type index = pos - begin();
 
-	iterator erase(const_iterator position);
-	iterator erase(const_iterator first, const_iterator last);
+		make_empty_in_pos(pos, 1);
+		allocator_type::construct(pos, std::forward<Args>(args)...);
 
-	void push_back(const_reference value);
-	void push_back(value_type&& value);
+		return (begin() + index);
+	}
+
+	iterator erase(const_iterator position) {
+		return earse(position, (position + 1));
+	}
+	iterator erase(const_iterator first, const_iterator last) {
+		const size_type index = first - begin();
+
+		allocator_type::destroy(first, last);
+		earse_empty_in_pos(first, static_cast<size_type>(last - first));
+
+		return (begin() + index);
+	}
+
+	void push_back(const_reference value) {
+		insert(end(), 1, value);
+	}
+	void push_back(value_type&& value) {
+		insert(end(), 1, std::move(value));
+	}
 
 	template <class... Args>
-	reference emplace_back(Args&&... args);
+	reference emplace_back(Args&&... args) {
+		return *(emplace(end(), std::forward<Args>(args)...));
+	}
 
-	void pop_back();
+	void pop_back() {
+		--finish_;
+		allocator_type::destroy(finish_);
+	}
 
-	void resize(size_type count);
+	void resize(size_type count) {
+		resize(count, value_type());
+	}
 	void resize(size_type count, const value_type& value);
 
 	void swap(vector& other);
 
 private:
 	size_type get_new_capacity(size_type len) const;
-	template <class InputIterator>
-	void insert_aux(iterator      position,
-	                InputIterator first,
-	                InputIterator last,
-	                std::false_type);
-	template <class Integer>
-	void insert_aux(iterator position, Integer n, const value_type& value,
-	                std::true_type);
+
+	void make_empty_before_pos(const_iterator pos, size_type count);
+	void earse_empty_in_pos(const_iterator pos, size_type count);
+
+	void memmove_aux(const_iterator dest, const_iterator src, size_type count, _true_type, _common_direction){
+		memmove(src, dest, count * sizeof(value_type));
+	}
+	void memmove_aux(const_iterator dest, const_iterator src, size_type count, _true_type, _reverse_direction){
+		memmove(src, dest, count * sizeof(value_type));
+	}
+	void memmove_aux(const_iterator dest, const_iterator src, size_type count, _false_type, _common_direction){
+		for (size_type i=0; i < count; ++i, ++src, ++dest) 
+			allocator_type::construct(dest, std::move(static_cast<value_type>(*src)));
+	}
+	void memmove_aux(const_iterator dest, const_iterator src, size_type count, _false_type, _reverse_direction){
+
+		// 反方向即需要移动 [src, src + count) 元素至 [dest, dest + count)
+		const_iterator src_reverse = src + count - 1, dest_reverse = dest + count - 1;
+		for (size_type i=0; i < count; ++i, --src_reverse, --dest_reverse) 
+			allocator_type::construct(dest_reverse, std::move(static_cast<value_type>(*src_reverse)));
+	}
 };
 
-template <class T, class Alloc>
-bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+// 此处就简单用循环实现了下
 
 template <class T, class Alloc>
-bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+	if (lhs.size() != rhs.size())
+		return false;
+
+	return mSTL::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
 
 template <class T, class Alloc>
-bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+	return !(lhs == rhs);
+}
 
 template <class T, class Alloc>
-bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+	if (lhs.size() != rhs.size())
+		return false;
+
+	for (auto item_lhs = lhs.begin(), item_rhs = rhs.begin(); item_lhs != lhs.end(); ++item_lhs, ++item_rhs) 
+		if (*item_lhs > *item_rhs) 
+			return false;
+
+	return true;
+}
 
 template <class T, class Alloc>
-bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+	return !(lhs > rhs);
+}
 
 template <class T, class Alloc>
-bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs);
+bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+	if (lhs.size() != rhs.size())
+		return false;
+
+	for (auto item_lhs = lhs.begin(), item_rhs = rhs.begin(); item_lhs != lhs.end(); ++item_lhs, ++item_rhs) 
+		if (*item_lhs < *item_rhs) 
+			return false;
+
+	return true;
+}
 
 template <class T, class Alloc>
-void swap(vector<T, Alloc>& lhs, vector<T, Alloc>& rhs);
+bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+	return !(lhs < rhs);
+}
 
+template <class T, class Alloc>
+void swap(vector<T, Alloc>& lhs, vector<T, Alloc>& rhs) {
+	lhs.swap(rhs);
+}
+
+// 此处标准库采用的似乎并不是这种简单实现，具有更好的性能
 template <class T, class Alloc, class U>
-typename vector<T, Alloc>::size_type erase(vector<T, Alloc>& c, const U& value);
+typename vector<T, Alloc>::size_type erase(vector<T, Alloc>& c, const U& value){
+	size_t count = 0;
+	for (auto item = c.begin(); item != c.end(); ++item) {
+		if (*item == value) {
+			item = c.erase(item);
+			++count;
+		}
+	}
+	return count;
+}
 
 template <class T, class Alloc, class Pred>
-typename vector<T, Alloc>::size_type erase_if(vector<T, Alloc>& c, Pred pred);
+typename vector<T, Alloc>::size_type erase_if(vector<T, Alloc>& c, Pred pred) {
+	size_t count = 0;
+	for (auto item = c.begin(); item != c.end(); ++item) {
+		if (pred) {
+			item = c.erase(item);
+			++count;
+		}
+	}
+	return count;
+}
 
 MSTL_NAMESPACE_END
 

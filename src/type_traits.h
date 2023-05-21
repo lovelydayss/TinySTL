@@ -23,6 +23,10 @@ namespace {
 struct _true_type {};
 struct _false_type {};
 
+// 用于确定 memmove 移动方向
+struct _common_direction {};
+struct _reverse_direction {};
+struct _all_direction {};
 
 // 萃取传入的 T 类型的类型特性
 

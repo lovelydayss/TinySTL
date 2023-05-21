@@ -353,33 +353,149 @@ void swap(T (&a)[N], T (&b)[N]) {
 //<- Heap operations
 
 //<- Minimum / maximum operations
+// max
+template <class T>
+const T& max(const T& a, const T& b) {
+	return std::max(a, b);
+}
 
+template <class T, class Compare>
+const T& max(const T& a, const T& b, Compare comp) {
+	return std::max(a, b, comp);
+}
+
+template <class T>
+T max(std::initializer_list<T> ilist) {
+	return std::max(ilist);
+}
+
+template <class T, class Compare>
+T max(std::initializer_list<T> ilist, Compare comp) {
+	return std::max(ilist, comp);
+}
+
+// max_element
+template <class ForwardIt>
+ForwardIt max_element(ForwardIt first, ForwardIt last) {
+	return std::max_element(first, last);
+}
+
+template <class ForwardIt, class Compare>
+ForwardIt max_element(ForwardIt first, ForwardIt last, Compare comp) {
+	return std::max_element(first, last, comp);
+}
+
+// min
+template <class T>
+const T& min(const T& a, const T& b) {
+	return std::min(a, b);
+}
+
+template <class T, class Compare>
+const T& min(const T& a, const T& b, Compare comp) {
+	return std::min(a, b, comp);
+}
+
+template <class T>
+T min(std::initializer_list<T> ilist) {
+	return std::min(ilist);
+}
+
+template <class T, class Compare>
+T min(std::initializer_list<T> ilist, Compare comp) {
+	return std::min(ilist, comp);
+}
+
+// min_element
+template <class ForwardIt>
+ForwardIt min_element(ForwardIt first, ForwardIt last) {
+	return std::min_element(first, last);
+}
+
+template <class ForwardIt, class Compare>
+ForwardIt min_element(ForwardIt first, ForwardIt last, Compare comp) {
+	return std::min_element(first, last, comp);
+}
+
+// minmax
+template <class T>
+std::pair<const T&, const T&> minmax(const T& a, const T& b) {
+	return std::minmax(a, b);
+}
+
+template <class T, class Compare>
+std::pair<const T&, const T&> minmax(const T& a, const T& b, Compare comp) {
+	return std::minmax(a, b, comp);
+}
+
+template <class T>
+std::pair<T, T> minmax(std::initializer_list<T> ilist) {
+	return std::minmax(ilist);
+}
+
+template <class T, class Compare>
+std::pair<T, T> minmax(std::initializer_list<T> ilist, Compare comp) {
+	return std::minmax(ilist, comp);
+}
+
+// minmax_element
+template <class ForwardIt>
+std::pair<ForwardIt, ForwardIt> minmax_element(ForwardIt first,
+                                               ForwardIt last) {
+	return std::minmax_element(first, last);
+}
+
+template <class ForwardIt, class Compare>
+std::pair<ForwardIt, ForwardIt> minmax_element(ForwardIt first, ForwardIt last,
+                                               Compare comp) {
+	return std::minmax_element(first, last, comp);
+}
+
+// clamp
+template <class T>
+constexpr const T& clamp(const T& v, const T& lo, const T& hi) {
+}
+
+template <class T, class Compare>
+constexpr const T& clamp(const T& v, const T& lo, const T& hi, Compare comp) {
+	
+}
 
 //<- Comparison operations
 ///<- equal series
 template <class InputIt1, class InputIt2>
-bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2);
+bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2) {
+	return std::equal(first1, last1, first2);
+}
 
 template <class InputIt1, class InputIt2, class BinaryPredicate>
-bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, BinaryPredicate p);
+bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2,
+           BinaryPredicate p) {
+	return std::equal(first1, last1, first2, p);
+}
 
 template <class InputIt1, class InputIt2>
-bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2);
+bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2) {
+		return std::equal(first1, last1, first2, last2);
+}
 
 template <class InputIt1, class InputIt2, class BinaryPredicate>
-bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2, BinaryPredicate p);
+bool equal(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2,
+           BinaryPredicate p) {
+	    return std::equal(first1, last1, first2, last2, p);
+}
 
 ///<- lexicographical_compare series
 template <class InputIt1, class InputIt2>
 bool lexicographical_compare(InputIt1 first1, InputIt1 last1, InputIt2 first2,
                              InputIt2 last2) {
-	
+	return std::lexicographical_compare(first1, last1, first2, last2);
 }
 
 template <class InputIt1, class InputIt2, class Compare>
 bool lexicographical_compare(InputIt1 first1, InputIt1 last1, InputIt2 first2,
                              InputIt2 last2, Compare comp) {
-	
+	return std::lexicographical_compare(first1, last1, first2, last2, comp);
 }
 
 //<- Permutation operations
