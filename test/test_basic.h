@@ -1,0 +1,14 @@
+#ifndef TEST_BASIC_H
+#define TEST_BASIC_H
+
+#include <cstddef>
+
+#define MSTL_TEST_NAMESPACE_BEGIN namespace mSTL {
+
+#define MSTL_TEST_NAMESPACE_END }
+
+MSTL_TEST_NAMESPACE_BEGIN
+
+MSTL_TEST_NAMESPACE_END
+
+#endif
