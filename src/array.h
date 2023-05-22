@@ -231,8 +231,8 @@ struct array {
 	using pointer = value_type*;
 	using const_pointer = const value_type*;
 
-	using iterator = _iterator<random_access_iterator_tag, value_type>;
-	using const_iterator = _iterator<random_access_iterator_tag, const value_type>;
+	using iterator = value_type*;
+	using const_iterator = const value_type*;
 
 	using reverse_iterator = _reverse_iterator<iterator>;
 	using const_reverse_iterator = _reverse_iterator<const_iterator>;
@@ -266,15 +266,15 @@ struct array {
 	constexpr const_pointer data() const { return AT_Type::static_ptr(M_elems);}
 
 	// Iterators
-	constexpr iterator begin() { return iterator(data()); }
-	constexpr const_iterator cbegin() const { return const_iterator(data()); }
-	constexpr iterator end() { return iterator(data() + N); }
-	constexpr const_iterator cend() const { return const_iterator(data() + N); }
+	constexpr iterator begin() { return  static_cast<iterator>(data()); }
+	constexpr const_iterator cbegin() const { return  static_cast<const_iterator>(data()); }
+	constexpr iterator end() { return  static_cast<iterator>(data() + N); }
+	constexpr const_iterator cend() const { return  static_cast<const_iterator>(data() + N); }
 
-	constexpr reverse_iterator rbegin() { return reverse_iterator(data() + N); }
-	constexpr const_reverse_iterator crbegin() const { return const_reverse_iterator(data() + N); }
-	constexpr reverse_iterator rend() { return reverse_iterator(data()); }
-	constexpr const_reverse_iterator crend() const { return const_reverse_iterator(data()); }
+	constexpr reverse_iterator rbegin() { return static_cast<reverse_iterator>(data() + N); }
+	constexpr const_reverse_iterator crbegin() const { return static_cast<const_reverse_iterator>(data() + N); }
+	constexpr reverse_iterator rend() { return static_cast<reverse_iterator>(data()); }
+	constexpr const_reverse_iterator crend() const { return static_cast<const_reverse_iterator>(data()); }
 
 
 	// Capacity
