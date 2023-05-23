@@ -1,6 +1,7 @@
 #ifndef UNINITIALIZED_H
 #define UNINITIALIZED_H
 
+#include "algorithm.h"
 #include "basic.h"
 
 #include "allocator.h"
@@ -13,7 +14,6 @@
 #include <exception>
 
 MSTL_NAMESPACE_BEGIN
-
 
 // allocator 无关 uninitialized_mem_func
 
@@ -106,8 +106,7 @@ ForwardIterator uninitialized_move(InputIterator first, InputIterator last,
 template <class ForwardIterator, class T>
 void _uninitialized_fill_aux(ForwardIterator first, ForwardIterator last,
                              const T& value, _true_type) {
-	// 此处未采用直接调用 fill 函数写法，直接设置内存实现优化
-	memset(first, value, last - first);
+	mSTL::fill(first, last, value);
 }
 
 // is not POD type
@@ -141,7 +140,7 @@ void uninitialized_fill(ForwardIterator first, ForwardIterator last,
 template <class ForwardIterator, class Size, class T>
 ForwardIterator _uninitialized_fill_n_aux(ForwardIterator first, Size n,
                                           const T& value, _true_type) {
-	memset(first, value, n);
+	fill_n(first, n, value);
 	return (first + n);
 }
 

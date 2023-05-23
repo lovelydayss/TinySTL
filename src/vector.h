@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <cassert>
 #include <cstddef>
 #include <limits>
 
@@ -57,40 +58,92 @@ public:
 	explicit vector(const size_type count,
 	                const_reference value = value_type()) {
 		start_ = allocator_type::allocate(count);
-		finish_ = uninitialized_mem_func_type::fill_n(begin(), count, value);
-		end_of_storage_ = start_ + count;
+		uninitialized_mem_func_type::fill_n(start_, count, value);
+
+		finish_ = start_ + count;
+		end_of_storage_ = finish_;
 	}
 	template <class InputIterator>
 	vector(InputIterator first, InputIterator last) {
-		start_ = allocator_type::allocate(static_cast<size_type>(last - first));
-		finish_ = uninitialized_mem_func_type::copy(first, last, begin());
-		end_of_storage_ = finish_;
+		alloc_n_and_copy(&*first, &*last, static_cast<size_type>(last - first));
 	}
 
-	vector(const vector& other) { *this = other; }
-	vector(vector&& other) { *this = std::move(other); }
-	vector& operator=(const vector& other);
-	vector& operator=(vector&& other);
+	vector(const vector& other) {
+		alloc_n_and_copy(other.begin(), other.end(), other.capacity());
+	}
+	vector(vector&& other) {
 
-	vector(const std::initializer_list<T>& il) { *this = il; }
-	vector& operator=(const std::initializer_list<T>& il);
+		start_ = other.start_;
+		finish_ = other.finish_;
+		end_of_storage_ = other.end_of_storage_;
 
-	void assign(size_type count, const_reference value);
+		other.start_ = nullptr;
+		other.finish_ = nullptr;
+		other.end_of_storage_ = nullptr;
+	}
+	vector& operator=(const vector& other) {
+		if (this == &other)
+			return *this;
+
+		clear();
+		realloc_and_move(other.capacity());
+		uninitialized_mem_func_type::copy(other.begin(), other.end(), begin());
+		finish_ = start_ + other.size();
+
+		return *this;
+	}
+	vector& operator=(vector&& other) {
+		if (this == &other)
+			return *this;
+
+		clear();
+		allocator_type::deallocate(begin(), capacity());
+
+		start_ = other.start_;
+		finish_ = other.finish_;
+		end_of_storage_ = other.end_of_storage_;
+
+		other.start_ = nullptr;
+		other.finish_ = nullptr;
+		other.end_of_storage_ = nullptr;
+
+		return *this;
+	}
+
+	vector(const std::initializer_list<T>& il) {
+		alloc_n_and_copy(il.begin(), il.end(), il.size());
+	}
+	vector& operator=(const std::initializer_list<T>& il) {
+		clear();
+		realloc_and_move(il.size());
+		uninitialized_mem_func_type::copy(il.begin(), il.end(), begin());
+		finish_ = start_ + il.size();
+
+		return *this;
+	}
+
+	void assign(size_type count, const_reference value) {
+		clear();
+		reserve(count);
+		uninitialized_mem_func_type::fill_n(start_, count, value);
+		finish_ = start_ + count;
+	}
 	template <class InputIterator>
-	void assign(InputIterator first, InputIterator last);
+	void assign(InputIterator first, InputIterator last) {
+		clear();
+		reserve(static_cast<size_type>(last - first));
+		uninitialized_mem_func_type::copy(&*first, &*last, start_);
+		finish_ = start_ + static_cast<size_type>(last - first);
+	}
 
 	void assign(const std::initializer_list<T>& il) {
 		assign(il.begin(), il.end());
 	}
 
 	~vector() noexcept {
-		if (start_ == nullptr)
-			return;
-
-		if (start_ != finish_)
-			allocator_type::destroy(begin(), end());
-
+		clear();
 		allocator_type::deallocate(begin(), capacity());
+		start_ = finish_ = end_of_storage_ = nullptr;
 	}
 
 	// allocator_type get_allocator() { return allocator_type(); }
@@ -133,28 +186,29 @@ public:
 	}
 
 	reverse_iterator rbegin() noexcept {
-		return static_cast<reverse_iterator>(finish_);
+		return static_cast<reverse_iterator>(finish_ - 1);
 	}
 	const_reverse_iterator rbegin() const noexcept {
-		return static_cast<const_reverse_iterator>(finish_);
+		return static_cast<const_reverse_iterator>(finish_ - 1);
 	}
 	const_reverse_iterator crbegin() const noexcept {
-		return static_cast<const_reverse_iterator>(finish_);
+		return static_cast<const_reverse_iterator>(finish_ - 1);
 	}
 
 	reverse_iterator rend() noexcept {
-		return static_cast<reverse_iterator>(start_);
+		return static_cast<reverse_iterator>(start_ - 1);
 	}
 	const_reverse_iterator rend() const noexcept {
-		return static_cast<const_reverse_iterator>(start_);
+		return static_cast<const_reverse_iterator>(start_ - 1);
 	}
 	const_reverse_iterator crend() const noexcept {
-		return static_cast<const_reverse_iterator>(start_);
+		return static_cast<const_reverse_iterator>(start_ - 1);
 	}
 
 	// Capacity
 
-	bool      empty() const noexcept { return start_ == finish_; }
+	bool empty() const noexcept { return start_ == finish_; }
+
 	size_type size() const noexcept {
 		return static_cast<size_type>(finish_ - start_);
 	}
@@ -176,7 +230,7 @@ public:
 	// Modifiers
 
 	void clear() noexcept {
-		allocator_type::destroy(begin(), end());
+		allocator_type::destroy(start_, finish_);
 		finish_ = start_;
 	}
 	iterator insert(const_iterator pos, const_reference value) {
@@ -185,8 +239,8 @@ public:
 	iterator insert(const_iterator pos, value_type&& value) {
 		const size_type index = pos - begin();
 
-		make_empty_in_pos(pos, 1);
-		allocator_type::construct(pos, std::move(value));
+		make_empty_before_pos(const_cast<pointer>(pos), 1);
+		allocator_type::construct(const_cast<pointer>(pos), std::move(value));
 
 		return (begin() + index);
 	}
@@ -194,18 +248,22 @@ public:
 	                const_reference value) {
 		const size_type index = pos - begin();
 
-		make_empty_in_pos(pos, count);
-		uninitialized_mem_func_type::fill_n(pos, count, value);
+		make_empty_before_pos(const_cast<pointer>(pos), count);
+		uninitialized_mem_func_type::fill_n(
+		    const_cast<pointer>(begin() + index), count, value);
 
 		return (begin() + index);
 	}
 	template <class InputIterator>
 	iterator insert(const_iterator pos, InputIterator first,
 	                InputIterator last) {
+
 		const size_type index = pos - begin();
 
-		make_empty_in_pos(pos, static_cast<size_type>(last - first));
-		uninitialized_mem_func_type::copy(first, last, pos);
+		make_empty_before_pos(const_cast<pointer>(pos),
+		                      static_cast<size_type>(last - first));
+		uninitialized_mem_func_type::copy(first, last,
+		                                  const_cast<pointer>(pos));
 
 		return (begin() + index);
 	}
@@ -217,8 +275,9 @@ public:
 	iterator emplace(const_iterator pos, Args&&... args) {
 		const size_type index = pos - begin();
 
-		make_empty_in_pos(pos, 1);
-		allocator_type::construct(pos, std::forward<Args>(args)...);
+		make_empty_before_pos(const_cast<pointer>(pos), 1);
+		allocator_type::construct(const_cast<pointer>(pos),
+		                          std::forward<Args>(args)...);
 
 		return (begin() + index);
 	}
@@ -229,8 +288,10 @@ public:
 	iterator erase(const_iterator first, const_iterator last) {
 		const size_type index = first - begin();
 
-		allocator_type::destroy(first, last);
-		earse_empty_in_pos(first, static_cast<size_type>(last - first));
+		allocator_type::destroy(const_cast<pointer>(first),
+		                        const_cast<pointer>(last));
+		earse_empty_in_pos(const_cast<pointer>(first),
+		                   static_cast<size_type>(last - first));
 
 		return (begin() + index);
 	}
@@ -248,27 +309,55 @@ public:
 		allocator_type::destroy(finish_);
 	}
 
-	void resize(size_type count) { resize(count, value_type()); }
-	void resize(size_type count, const value_type& value);
+	void resize(size_type count, const_reference value = value_type()) {
+		size_type old_size = size();
+		size_type old_capacity = capacity();
 
-	void swap(vector& other);
+		if (count < old_size) {
+			allocator_type::destroy((start_ + count), finish_);
+		} else if (count > old_size && count <= old_capacity) {
+			uninitialized_mem_func_type::fill_n(finish_, (count - old_size),
+			                                    value);
+		} else if (count > old_capacity) {
+			realloc_and_move(get_new_capacity(count));
+			uninitialized_mem_func_type::fill_n(finish_, (count - old_size),
+			                                    value);
+		}
+
+		finish_ = start_ + count;
+	}
+
+	void swap(vector& other) {
+		if (this == &other)
+			return;
+
+		mSTL::swap(start_, other.start_);
+		mSTL::swap(finish_, other.finish_);
+		mSTL::swap(end_of_storage_, end_of_storage_);
+	}
 
 private:
 	inline size_type get_new_capacity(size_type len) const;
 
+	inline void alloc_n_and_copy(const_iterator first, const_iterator last,
+	                             size_type count);
 	inline void realloc_and_move(size_type count);
 
-	void make_empty_before_pos(const_iterator pos, size_type count);
-	void earse_empty_in_pos(const_iterator pos, size_type count);
+	inline void make_empty_before_pos(pointer pos, size_type count);
+	inline void earse_empty_in_pos(pointer pos, size_type count);
 
+	/*
 	inline void memmove_aux(const_iterator dest, const_iterator src,
 	                        size_type count, _true_type, _common_direction);
 	inline void memmove_aux(const_iterator dest, const_iterator src,
 	                        size_type count, _true_type, _reverse_direction);
-	inline void memmove_aux(const_iterator dest, const_iterator src,
-	                        size_type count, _false_type, _common_direction);
-	inline void memmove_aux(const_iterator dest, const_iterator src,
-	                        size_type count, _false_type, _reverse_direction);
+*/
+	inline void memmove_aux(pointer dest, pointer src, size_type count,
+	                        _true_type, _direction);
+	inline void memmove_aux(pointer dest, pointer src, size_type count,
+	                        _false_type, _common_direction);
+	inline void memmove_aux(pointer dest, pointer src, size_type count,
+	                        _false_type, _reverse_direction);
 };
 
 // 此处就简单用循环实现了下
@@ -351,6 +440,160 @@ typename vector<T, Alloc>::size_type erase_if(vector<T, Alloc>& c, Pred pred) {
 		}
 	}
 	return count;
+}
+
+// implement
+
+///<- (construct)(destruct)(copy)(operator=)(assign) ......
+
+//----------------- construct -------------------
+//----------------- copy -------------------
+//----------------- operator= -------------------
+//----------------- assign -------------------
+//----------------- destruct -------------------
+
+///<- Capacity ......
+///<- Modifiers
+
+///<- private function
+
+template <class T, class Alloc>
+inline typename vector<T, Alloc>::size_type
+vector<T, Alloc>::get_new_capacity(size_type len) const {
+	/*
+	size_type old_capacity = capacity();
+
+	size_type new_capacity = old_capacity + mSTL::max(old_capacity, len);
+	assert(new_capacity < max_size());
+
+	return (old_capacity == 0 ? len : new_capacity);
+*/
+	return (capacity() == 0 ? len : capacity() * 2);
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::alloc_n_and_copy(const_iterator first,
+                                               const_iterator last,
+                                               size_type      count) {
+	start_ = allocator_type::allocate(count);
+	uninitialized_mem_func_type::copy(first, last, start_);
+
+	finish_ = start_ + static_cast<size_type>(last - first);
+	end_of_storage_ = start_ + count;
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::realloc_and_move(size_type count) {
+
+	pointer new_start_ = allocator_type::allocate(count);
+
+	size_type old_size = size();
+
+	// 此处 count 默认会大于等于 old_size 即元素个数
+	// 即不会产生截断情况
+	assert(count >= old_size);
+
+	if (start_ != nullptr) {
+		// 数据移动
+		uninitialized_mem_func_type::move(start_, finish_, new_start_);
+		allocator_type::deallocate(start_, capacity());
+	}
+
+	start_ = new_start_;
+	finish_ = start_ + old_size;
+	end_of_storage_ = start_ + count;
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::make_empty_before_pos(pointer   pos,
+                                                    size_type count) {
+	size_type new_size = size() + count;
+
+	size_type size_before_pos = static_cast<size_type>(pos - begin());
+	size_type size_after_pos = static_cast<size_type>(end() - pos);
+
+	typedef typename _type_traits<value_type>::is_POD_type isPODType;
+
+	if (new_size <= capacity()) {
+		memmove_aux((pos + count), pos, size_after_pos, isPODType(),
+		            _reverse_direction());
+		finish_ = start_ + new_size;
+	} else {
+
+		size_type new_capacity = get_new_capacity(new_size);
+		// 构建新的内存块
+		pointer new_start_ = allocator_type::allocate(new_capacity);
+
+		if (start_ != nullptr) {
+
+			memmove_aux(new_start_, start_, size_before_pos, isPODType(),
+			            _common_direction());
+			memmove_aux((new_start_ + size_before_pos + count), pos,
+			            size_after_pos, isPODType(), _reverse_direction());
+
+			// 释放此前的内存块
+			allocator_type::deallocate(start_, capacity());
+		}
+
+		start_ = new_start_;
+		finish_ = start_ + new_size;
+		end_of_storage_ = start_ + new_capacity;
+	}
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::earse_empty_in_pos(pointer pos, size_type count) {
+
+	pointer   dest = pos + count;
+	size_type size_move = finish_ - dest;
+
+	typedef typename _type_traits<value_type>::is_POD_type isPODType;
+	memmove_aux(pos, dest, size_move, isPODType(), _common_direction());
+	finish_ = pos + size_move;
+}
+
+/*
+template <class T, class Alloc>
+inline void vector<T, Alloc>::memmove_aux(const_iterator dest,
+                                          const_iterator src, size_type count,
+                                          _true_type, _common_direction) {
+	memmove(src, dest, count * sizeof(value_type));
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::memmove_aux(const_iterator dest,
+                                          const_iterator src, size_type count,
+                                          _true_type, _reverse_direction) {
+	memmove(src, dest, count * sizeof(value_type));
+}
+*/
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
+                                          size_type count, _true_type,
+                                          _direction) {
+	memmove(src, dest, count * sizeof(value_type));
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
+                                          size_type count, _false_type,
+                                          _common_direction) {
+	for (size_type i = 0; i < count; ++i, ++src, ++dest)
+		allocator_type::construct(dest,
+		                          std::move(static_cast<value_type>(*src)));
+}
+
+template <class T, class Alloc>
+inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
+                                          size_type count, _false_type,
+                                          _reverse_direction) {
+
+	// 反方向即需要移动 [src, src + count) 元素至 [dest, dest + count)
+	pointer src_reverse = src + count - 1, dest_reverse = dest + count - 1;
+	for (size_type i = 0; i < count; ++i, --src_reverse, --dest_reverse)
+		allocator_type::construct(
+		    dest_reverse, std::move(static_cast<value_type>(*src_reverse)));
 }
 
 MSTL_NAMESPACE_END

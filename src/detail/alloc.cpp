@@ -1,6 +1,6 @@
 #include "../alloc.h"
 
-namespace mSTL {
+MSTL_NAMESPACE_BEGIN
 
 char* alloc::start_free = nullptr;
 char* alloc::end_free = nullptr;
@@ -179,4 +179,4 @@ void* alloc::reallocate(void* p, size_t old_n, size_t new_n) {
 	return p;
 }
 
-} // namespace mSTL
+MSTL_NAMESPACE_END
