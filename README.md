@@ -6,43 +6,43 @@
 
 ### 基本组件
 
-|               功能/组件               |                   路径                   | 完成情况 |   线程安全支持   |               单元测试               | 性能对比 | 功能/组件来源参考 |
-| :------------------------------------: | :---------------------------------------: | :-------: | :---------------: | :----------------------------------: | :-------: | :---------------: |
-|               allocator               |        [allocator.h](src/allocator.h)        | completed |      ......      |                ......                |  ......  |     STL C++11     |
-|              type_traits              |      [type_traits.h](src/type_traits.h)      | completed |      ......      |                ......                |  ......  |     STL C++11     |
-|                iterator                |         [iterator.h](src/iterator.h)         | completed |      ......      |                ......                |  ......  |     STL C++11     |
-|               algorithm               |        [algorithm.h](src/algorithm.h)        | completed |      ......      |                to do                |  ......  |     STL C++11     |
-|            initializer_list            | [initializer_list.h](src/initializer_list.h) | completed |      ......      |                ......                |  ......  |     STL C++11     |
-|                  pair                  |                  pair.h                  | completed |      ......      |                to do                |   to do   |     STL C++11     |
-|                 tuple                 |                  tuple.h                  | completed |      ......      |                to do                |   to do   |     STL C++11     |
-|                 array                 |            [array.h](src/array.h)            | completed |    mt_array.h    |  [test_array.cpp](test/test_array.cpp)  | completed |     STL C++11     |
-|                 vector                 |           [vector.h](src/vector.h)           | completed |      ......      | [test_vector.cpp](test/test_vector.cpp) | completed |     STL C++11     |
-|                fbvector                |                fbvector.h                |   to do   |      ......      |                ......                |  ......  |      ......      |
-|                  span                  |                  span.h                  |   to do   |      ......      |                ......                |  ......  |     STL C++20     |
-|                  list                  |                  list.h                  | completed |     mt_list.h     |                to do                |   to do   |     STL C++11     |
-|              forward_list              |              forward_list.h              | completed | mt_forward_list.h |                to do                |   to do   |     STL C++11     |
-|            circular buffer            |             circular_buffer.h             | completed |      ......      |                to do                |   to do   |      ......      |
-|              suffix array              |              suffix_array.h              |   to do   |      ......      |                ......                |  ......  |      ......      |
-|                 deque                 |                  deque.h                  | completed |      ......      |                to do                |   to do   |     STL C++11     |
-|                 stack                 |                  stack.h                  | completed |      ......      |                to do                |   to do   |     STL C++11     |
-|                 queue                 |                  queue.h                  | completed |      ......      |                to do                |   to do   |     STL C++11     |
-|             priority_queue             |             priority_queue.h             | completed |      ......      |                to do                |   to do   |     STL C++1     |
-|              disjoint set              |              disjoint_set.h              | completed |      ......      |                to do                |   to do   |      ......      |
-|              map/multimap              |                   map.h                   |   to do   |      ......      |                ......                |  ......  |     STL C++11     |
-| unordered_map/<br />unordered_multimap |              unordered_map.h              |   to do   |      ......      |                ......                |  ......  |     STL C++11     |
-|              set/multiset              |                   set.h                   |   to do   |      ......      |                ......                |  ......  |     STL C++11     |
-| unordered_set/<br />unordered_multiset |              unordered_set.h              |   to do   |      ......      |                ......                |  ......  |     STL C++11     |
-|                 string                 |                 string.h                 | completed |      ......      |                to do                |  ......  |     STL C++11     |
-|                fbstring                |                fbstring.h                | completed |      ......      |                to do                |  ......  |       folly       |
-|              string_view              |               string_view.h               | completed |      ......      |                to do                |  ......  |     STL C++17     |
-|                 bitmap                 |                 bitmap.h                 |   to do   |      ......      |                ......                |  ......  |      ......      |
-|               skip_list               |                skip_list.h                | completed |  mt_skip_list.h  |                to do                |  ......  |       redis       |
-|                avl_tree                |                avl_tree.h                |   to do   |      ......      |                ......                |  ......  |      ......      |
-|                 b_tree                 |                 b_tree.h                 |   to do   |      ......      |                ......                |  ......  |      ......      |
-|                b+_tree                |               bplus_tree.h               |   to do   |      ......      |                ......                |  ......  |      ......      |
-|                rb_tree                |                 rb_tree.h                 |   to do   |      ......      |                ......                |  ......  |      ......      |
-|               trie tree               |                trie_tree.h                |   to do   |      ......      |                ......                |  ......  |      ......      |
-|                 graph                 |                  graph.h                  |   to do   |      ......      |                ......                |  ......  |      ......      |
+|          功能/组件          |                   路径                   | 完成情况 |  线程安全支持  |            单元测试            | 性能对比 |    来源参考    |
+| :--------------------------: | :---------------------------------------: | :-------: | :------------: | :----------------------------: | :-------: | :-------------: |
+|          allocator          |        [allocator.h](src/allocator.h)        | completed |     ......     |             ......             |  ......  | STL<br />C++11 |
+|         type_traits         |      [type_traits.h](src/type_traits.h)      | completed |     ......     |             ......             |  ......  | STL<br />C++11 |
+|           iterator           |         [iterator.h](src/iterator.h)         | completed |     ......     |             ......             |  ......  | STL<br />C++11 |
+|          algorithm          |        [algorithm.h](src/algorithm.h)        | completed |     ......     |             to do             |  ......  | STL<br />C++11 |
+|       initializer_list       | [initializer_list.h](src/initializer_list.h) | completed |     ......     |             ......             |  ......  | STL<br /> C++11 |
+|             pair             |                  pair.h                  | completed |     ......     |             to do             |   to do   | STL<br />C++11 |
+|            tuple            |                  tuple.h                  | completed |     ......     |             to do             |   to do   | STL <br />C++11 |
+|            array            |            [array.h](src/array.h)            | completed |   mt_array.h   | [completed](test/test_array.cpp) | completed | STL <br />C++11 |
+|            vector            |           [vector.h](src/vector.h)           | completed |     ......     | [completed](test/test_vector.cpp) | completed | STL <br />C++11 |
+|           fbvector           |                fbvector.h                |   to do   |     ......     |             ......             |  ......  |     ......     |
+|             span             |                  span.h                  |   to do   |     ......     |             ......             |  ......  | STL <br />C++20 |
+|             list             |                  list.h                  | completed |   mt_list.h   |             to do             |   to do   | STL <br />C++11 |
+|         forward_list         |              forward_list.h              | completed |                |             to do             |   to do   | STL <br />C++11 |
+|       circular buffer       |             circular_buffer.h             | completed |     ......     |             to do             |   to do   |     ......     |
+|         suffix array         |              suffix_array.h              |   to do   |     ......     |             ......             |  ......  |     ......     |
+|            deque            |                  deque.h                  | completed |     ......     |             to do             |   to do   | STL <br />C++11 |
+|            stack            |                  stack.h                  | completed |     ......     |             to do             |   to do   | STL <br />C++11 |
+|            queue            |                  queue.h                  | completed |     ......     |             to do             |   to do   | STL <br />C++11 |
+|        priority_queue        |             priority_queue.h             | completed |     ......     |             to do             |   to do   | STL <br />C++1 |
+|         disjoint set         |              disjoint_set.h              | completed |     ......     |             to do             |   to do   |     ......     |
+|         map/multimap         |                   map.h                   |   to do   |     ......     |             ......             |  ......  | STL <br />C++11 |
+| unordered_<br />map/multimap |              unordered_map.h              |   to do   |     ......     |             ......             |  ......  | STL <br />C++11 |
+|         set/multiset         |                   set.h                   |   to do   |     ......     |             ......             |  ......  | STL <br />C++11 |
+| unordered_<br />set/multiset |              unordered_set.h              |   to do   |     ......     |             ......             |  ......  | STL <br />C++11 |
+|            string            |                 string.h                 | completed |     ......     |             to do             |  ......  | STL <br />C++11 |
+|           fbstring           |                fbstring.h                | completed |     ......     |             to do             |  ......  |      folly      |
+|         string_view         |               string_view.h               | completed |     ......     |             to do             |  ......  | STL <br />C++17 |
+|            bitmap            |                 bitmap.h                 |   to do   |     ......     |             ......             |  ......  |     ......     |
+|          skip_list          |                skip_list.h                | completed | mt_skip_list.h |             to do             |  ......  |      redis      |
+|           avl_tree           |                avl_tree.h                |   to do   |     ......     |             ......             |  ......  |     ......     |
+|            b_tree            |                 b_tree.h                 |   to do   |     ......     |             ......             |  ......  |     ......     |
+|           b+_tree           |               bplus_tree.h               |   to do   |     ......     |             ......             |  ......  |     ......     |
+|           rb_tree           |                 rb_tree.h                 |   to do   |     ......     |             ......             |  ......  |     ......     |
+|          trie tree          |                trie_tree.h                |   to do   |     ......     |             ......             |  ......  |     ......     |
+|            graph            |                  graph.h                  |   to do   |     ......     |             ......             |  ......  |     ......     |
 
 ### 线程安全相关
 
