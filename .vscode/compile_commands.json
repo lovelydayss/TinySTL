@@ -1,0 +1,11 @@
+[
+{
+  "directory": "/home/lovelydayss/Code/mSTL",
+  "arguments": ["/usr/bin/gcc", "-c", "-m64", "-std=c++11", "-g", "-o", "build/.objs/test_vector/linux/x86_64/release/src/detail/alloc.cpp.o", "src/detail/alloc.cpp"],
+  "file": "src/detail/alloc.cpp"
+},
+{
+  "directory": "/home/lovelydayss/Code/mSTL",
+  "arguments": ["/usr/bin/gcc", "-c", "-m64", "-std=c++11", "-g", "-o", "build/.objs/test_vector/linux/x86_64/release/test/test_vector.cpp.o", "test/test_vector.cpp"],
+  "file": "test/test_vector.cpp"
+}]

@@ -8,6 +8,7 @@
 #include "iterator.h"
 #include "type_traits.h"
 #include "utility.h"
+#include <cstddef>
 #include <cstring>
 #include <utility>
 
@@ -347,6 +348,7 @@ template <class T, class Allocator>
 class uninitialized_mem_func {
 public:
 	using value_type = T;
+	using size_type = size_t;
 
 	using pointer = T*;
 	using const_pointer = const T*;
@@ -361,8 +363,9 @@ private:
 	template <class InputIterator, class ForwardIterator>
 	static ForwardIterator _copy_aux(InputIterator first, InputIterator last,
 	                                 ForwardIterator result, _true_type) {
-		memcpy(result, first, (last - first) * sizeof(*first));
-		return result + (last - first);
+		size_type count = static_cast<size_type>(last - first);
+		memcpy(&*result, &*first, count * sizeof(*first));
+		return result + count;
 	}
 
 	// is not POD type 情况下的 uninitialized_copy()
@@ -373,7 +376,7 @@ private:
 		ForwardIterator current = result;
 		try {
 			while (first != last) {
-				allocator_type::construct(&*current, *first);
+				allocator_type::construct(&*current, static_cast<value_type>(*first));
 				++first;
 				++current;
 			}
@@ -389,8 +392,9 @@ private:
 	template <class InputIterator, class ForwardIterator>
 	static ForwardIterator _move_aux(InputIterator first, InputIterator last,
 	                                 ForwardIterator result, _true_type) {
-		memmove(result, first, (last - first) * sizeof(*first));
-		return result + (last - first);
+		size_type count = static_cast<size_type>(last - first);
+		memmove(&*result, &*first, count * sizeof(*first));
+		return result + count;
 	}
 
 	// is not POD type 情况下的 uninitialized_copy()
@@ -401,7 +405,7 @@ private:
 		ForwardIterator current = result;
 		try {
 			while (first != last) {
-				allocator_type::construct(&*current, std::move(*first));
+				allocator_type::construct(&*current, std::move(*first));//?
 				++first;
 				++current;
 			}
@@ -428,7 +432,7 @@ private:
 		ForwardIterator current = first;
 		try {
 			while (current != last) {
-				allocator_type::construct(static_cast<pointer>(current), value);
+				allocator_type::construct(&*current, value);
 				++current;
 			}
 		} catch (std::exception error) {
@@ -455,7 +459,7 @@ private:
 		ForwardIterator last = first + count;
 		try {
 			while (current != last) {
-				allocator_type::construct(static_cast<pointer>(current), value);
+				allocator_type::construct(&*current, value);
 				++current;
 			}
 			return current;

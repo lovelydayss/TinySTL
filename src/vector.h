@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <iterator>
 #include <limits>
 
 #include "basic.h"
@@ -55,8 +56,7 @@ public:
 	    : start_(nullptr)
 	    , finish_(nullptr)
 	    , end_of_storage_(nullptr) {}
-	explicit vector(const size_type count,
-	                const_reference value = value_type()) {
+	vector(const size_type count, const_reference value = value_type()) {
 		start_ = allocator_type::allocate(count);
 		uninitialized_mem_func_type::fill_n(start_, count, value);
 
@@ -234,38 +234,37 @@ public:
 		finish_ = start_;
 	}
 	iterator insert(const_iterator pos, const_reference value) {
-		return insert(pos, 1, value);
+		return insert(pos, static_cast<size_type>(1), value);
 	}
 	iterator insert(const_iterator pos, value_type&& value) {
 		const size_type index = pos - begin();
+		make_empty_before_pos(const_cast<pointer>(pos),
+		                      static_cast<size_type>(1));
 
-		make_empty_before_pos(const_cast<pointer>(pos), 1);
-		allocator_type::construct(const_cast<pointer>(pos), std::move(value));
-
-		return (begin() + index);
+		pointer new_pos = begin() + index;
+		allocator_type::construct(new_pos, std::move(value));
+		return new_pos;
 	}
 	iterator insert(const_iterator pos, size_type count,
 	                const_reference value) {
 		const size_type index = pos - begin();
-
 		make_empty_before_pos(const_cast<pointer>(pos), count);
-		uninitialized_mem_func_type::fill_n(
-		    const_cast<pointer>(begin() + index), count, value);
 
-		return (begin() + index);
+		pointer new_pos = begin() + index;
+		uninitialized_mem_func_type::fill_n(new_pos, count, value);
+		return new_pos;
 	}
 	template <class InputIterator>
 	iterator insert(const_iterator pos, InputIterator first,
 	                InputIterator last) {
 
 		const size_type index = pos - begin();
-
 		make_empty_before_pos(const_cast<pointer>(pos),
 		                      static_cast<size_type>(last - first));
-		uninitialized_mem_func_type::copy(first, last,
-		                                  const_cast<pointer>(pos));
 
-		return (begin() + index);
+		pointer new_pos = begin() + index;
+		uninitialized_mem_func_type::copy(first, last, new_pos);
+		return new_pos;
 	}
 	iterator insert(const_iterator pos, const std::initializer_list<T>& il) {
 		return insert(pos, il.begin(), il.end());
@@ -274,30 +273,34 @@ public:
 	template <class... Args>
 	iterator emplace(const_iterator pos, Args&&... args) {
 		const size_type index = pos - begin();
+		make_empty_before_pos(const_cast<pointer>(pos),
+		                      static_cast<size_type>(1));
 
-		make_empty_before_pos(const_cast<pointer>(pos), 1);
-		allocator_type::construct(const_cast<pointer>(pos),
-		                          std::forward<Args>(args)...);
-
+		pointer new_pos = begin() + index;
+		allocator_type::construct(new_pos, std::forward<Args>(args)...);
 		return (begin() + index);
 	}
 
 	iterator erase(const_iterator position) {
-		return earse(position, (position + 1));
+		return erase(position, (position + 1));
 	}
 	iterator erase(const_iterator first, const_iterator last) {
 		const size_type index = first - begin();
 
 		allocator_type::destroy(const_cast<pointer>(first),
 		                        const_cast<pointer>(last));
-		earse_empty_in_pos(const_cast<pointer>(first),
+		erase_empty_in_pos(const_cast<pointer>(first),
 		                   static_cast<size_type>(last - first));
 
 		return (begin() + index);
 	}
 
-	void push_back(const_reference value) { insert(end(), 1, value); }
-	void push_back(value_type&& value) { insert(end(), 1, std::move(value)); }
+	void push_back(const_reference value) {
+		insert(end(), static_cast<size_type>(1), value);
+	}
+	void push_back(value_type&& value) {
+		insert(end(), static_cast<size_type>(1), std::move(value));
+	}
 
 	template <class... Args>
 	reference emplace_back(Args&&... args) {
@@ -333,7 +336,7 @@ public:
 
 		mSTL::swap(start_, other.start_);
 		mSTL::swap(finish_, other.finish_);
-		mSTL::swap(end_of_storage_, end_of_storage_);
+		mSTL::swap(end_of_storage_, other.end_of_storage_);
 	}
 
 private:
@@ -344,30 +347,38 @@ private:
 	inline void realloc_and_move(size_type count);
 
 	inline void make_empty_before_pos(pointer pos, size_type count);
-	inline void earse_empty_in_pos(pointer pos, size_type count);
+	inline void erase_empty_in_pos(pointer pos, size_type count);
 
 	/*
-	inline void memmove_aux(const_iterator dest, const_iterator src,
-	                        size_type count, _true_type, _common_direction);
-	inline void memmove_aux(const_iterator dest, const_iterator src,
-	                        size_type count, _true_type, _reverse_direction);
+	inline void memmove_aux(pointer dest, pointer src, size_type count,
+	                        _true_type, _common_direction);
+	inline void memmove_aux(pointer dest, pointer src, size_type count,
+	                        _true_type, _reverse_direction);
+	
 */
+
 	inline void memmove_aux(pointer dest, pointer src, size_type count,
 	                        _true_type, _direction);
+
 	inline void memmove_aux(pointer dest, pointer src, size_type count,
 	                        _false_type, _common_direction);
 	inline void memmove_aux(pointer dest, pointer src, size_type count,
 	                        _false_type, _reverse_direction);
 };
 
-// 此处就简单用循环实现了下
+// 此处就简单采用循环比较实现了
 
 template <class T, class Alloc>
 bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
 	if (lhs.size() != rhs.size())
 		return false;
 
-	return mSTL::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	for (size_t i = 0; i < lhs.size(); ++i) {
+		if (lhs[i] != rhs[i])
+			return false;
+	}
+
+	return true;
 }
 
 template <class T, class Alloc>
@@ -377,15 +388,17 @@ bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
 
 template <class T, class Alloc>
 bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
-	if (lhs.size() != rhs.size())
-		return false;
 
-	for (auto item_lhs = lhs.begin(), item_rhs = rhs.begin();
-	     item_lhs != lhs.end(); ++item_lhs, ++item_rhs)
-		if (*item_lhs > *item_rhs)
+	size_t min_size = mSTL::min(lhs.size(), rhs.size());
+
+	for (size_t i = 0; i < min_size; ++i) {
+		if (lhs[i] > rhs[i])
 			return false;
+		else if (lhs[i] < rhs[i])
+			return true;
+	}
 
-	return true;
+	return lhs.size() < rhs.size() ? true : false;
 }
 
 template <class T, class Alloc>
@@ -395,15 +408,16 @@ bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
 
 template <class T, class Alloc>
 bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
-	if (lhs.size() != rhs.size())
-		return false;
+	size_t min_size = mSTL::min(lhs.size(), rhs.size());
 
-	for (auto item_lhs = lhs.begin(), item_rhs = rhs.begin();
-	     item_lhs != lhs.end(); ++item_lhs, ++item_rhs)
-		if (*item_lhs < *item_rhs)
+	for (size_t i = 0; i < min_size; ++i) {
+		if (lhs[i] < rhs[i])
 			return false;
+		else if (lhs[i] > rhs[i])
+			return true;
+	}
 
-	return true;
+	return lhs.size() > rhs.size() ? true : false;
 }
 
 template <class T, class Alloc>
@@ -416,31 +430,37 @@ void swap(vector<T, Alloc>& lhs, vector<T, Alloc>& rhs) {
 	lhs.swap(rhs);
 }
 
-// 此处标准库采用的似乎并不是这种简单实现，具有更好的性能
+// 此处标准库实现似乎具有更好的性能
+// C++20 进行支持
+
 template <class T, class Alloc, class U>
-typename vector<T, Alloc>::size_type erase(vector<T, Alloc>& c,
-                                           const U&          value) {
+size_t erase(vector<T, Alloc>& c, const U& value) {
 	size_t count = 0;
 	for (auto item = c.begin(); item != c.end(); ++item) {
 		if (*item == value) {
-			item = c.erase(item);
+			c.erase(item);
 			++count;
 		}
 	}
+
 	return count;
 }
 
+
+/*
 template <class T, class Alloc, class Pred>
-typename vector<T, Alloc>::size_type erase_if(vector<T, Alloc>& c, Pred pred) {
+size_t erase_if(vector<T, Alloc>& c, Pred pred) {
 	size_t count = 0;
 	for (auto item = c.begin(); item != c.end(); ++item) {
-		if (pred) {
-			item = c.erase(item);
+		if (pred(*item)) {
+			c.erase(item);
 			++count;
 		}
 	}
+
 	return count;
 }
+*/
 
 // implement
 
@@ -452,7 +472,7 @@ typename vector<T, Alloc>::size_type erase_if(vector<T, Alloc>& c, Pred pred) {
 //----------------- assign -------------------
 //----------------- destruct -------------------
 
-///<- Capacity ......
+///<- Capacity
 ///<- Modifiers
 
 ///<- private function
@@ -542,7 +562,7 @@ inline void vector<T, Alloc>::make_empty_before_pos(pointer   pos,
 }
 
 template <class T, class Alloc>
-inline void vector<T, Alloc>::earse_empty_in_pos(pointer pos, size_type count) {
+inline void vector<T, Alloc>::erase_empty_in_pos(pointer pos, size_type count) {
 
 	pointer   dest = pos + count;
 	size_type size_move = finish_ - dest;
@@ -554,25 +574,26 @@ inline void vector<T, Alloc>::earse_empty_in_pos(pointer pos, size_type count) {
 
 /*
 template <class T, class Alloc>
-inline void vector<T, Alloc>::memmove_aux(const_iterator dest,
-                                          const_iterator src, size_type count,
-                                          _true_type, _common_direction) {
-	memmove(src, dest, count * sizeof(value_type));
+inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
+                                          size_type count, _true_type,
+                                          _common_direction) {
+	memmove(dest, src, count * sizeof(value_type));
 }
 
 template <class T, class Alloc>
-inline void vector<T, Alloc>::memmove_aux(const_iterator dest,
-                                          const_iterator src, size_type count,
-                                          _true_type, _reverse_direction) {
-	memmove(src, dest, count * sizeof(value_type));
+inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
+                                          size_type count, _true_type,
+                                          _reverse_direction) {
+	memmove(dest, src, count * sizeof(value_type));
 }
+
 */
 
 template <class T, class Alloc>
 inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
                                           size_type count, _true_type,
                                           _direction) {
-	memmove(src, dest, count * sizeof(value_type));
+	memmove(dest, src, count * sizeof(value_type));
 }
 
 template <class T, class Alloc>
