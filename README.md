@@ -6,31 +6,31 @@
 
 ### 基本组件
 
-|    功能/组件    |                     路径                     | 完成情况 | 线程安全支持 |                 单元测试                 | 性能对比 | 功能/组件来源支持 |
-| :--------------: | :-------------------------------------------: | :-------: | :----------: | :---------------------------------------: | :-------: | :---------------: |
-|    allocator    |        [src/allocator.h](src/allocator.h)        | completed |    ......    |                  ......                  |  ......  |     STL C++11     |
-|     iterator     |         [src/iterator.h](src/iterator.h)         | completed |    ......    |                  ......                  |  ......  |     STL C++11     |
-|    algorithm    |        [src/algorithm.h](src/algorithm.h)        | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-| initializer_list | [src/initializer_list.h](src/initializer_list.h) | completed |    ......    |                  ......                  |  ......  |     STL C++11     |
-|      vector      |           [src/vector.h](src/vector.h)           | completed |    ......    | [test/test_vector.cpp](test/test_vector.cpp) | completed |     STL C++11     |
-|      array      |            [src/array.h](src/array.h)            | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|       list       |                  src/list.h                  | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|      deque      |                  src/deque.h                  | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|      stack      |                  src/stack.h                  | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|      queue      |                  src/queue.h                  | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|  priority_queue  |             src/priority_queue.h             | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|       map       |                   src/map.h                   |   to do   |    ......    |                  ......                  |  ......  |     STL C++11     |
-|  unordered_map  |              src/unordered_map.h              |   to do   |    ......    |                  ......                  |  ......  |     STL C++11     |
-|       set       |                   src/set.h                   |   to do   |    ......    |                  ......                  |  ......  |     STL C++11     |
-|  unordered_set  |              src/unordered_set.h              |   to do   |    ......    |                  ......                  |  ......  |     STL C++11     |
-|      string      |                 src/string.h                 | completed |    ......    |                   to do                   |  ......  |     STL C++11     |
-|   string_view   |               src/string_view.h               | completed |    ......    |                   to do                   |  ......  |                  |
-|      bitset      |                 src/bitset.h                 |   to do   |    ......    |                  ......                  |  ......  |                  |
-|    skip_list    |                src/skip_list.h                |   to do   |    ......    |                  ......                  |  ......  |                  |
-|     avl_tree     |                src/avl_tree.h                |   to do   |    ......    |                  ......                  |  ......  |                  |
-|      B_tree      |                 src/b_tree.h                 |   to do   |    ......    |                  ......                  |  ......  |                  |
-|     b+_tree     |               src/bplus_tree.h               |   to do   |    ......    |                  ......                  |  ......  |                  |
-|     rb_tree     |                 src/rb_tree.h                 |   to do   |    ......    |                  ......                  |  ......  |                  |
+|    功能/组件    |                     路径                     | 完成情况 |                 单元测试                 | 性能对比 | 功能/组件来源支持 |
+| :--------------: | :-------------------------------------------: | :-------: | :---------------------------------------: | :-------: | :---------------: |
+|    allocator    |        [src/allocator.h](src/allocator.h)        | completed |                  ......                  |  ......  |     STL C++11     |
+|     iterator     |         [src/iterator.h](src/iterator.h)         | completed |                  ......                  |  ......  |     STL C++11     |
+|    algorithm    |        [src/algorithm.h](src/algorithm.h)        | completed |                   to do                   |  ......  |     STL C++11     |
+| initializer_list | [src/initializer_list.h](src/initializer_list.h) | completed |                  ......                  |  ......  |     STL C++11     |
+|      vector      |           [src/vector.h](src/vector.h)           | completed | [test/test_vector.cpp](test/test_vector.cpp) | completed |     STL C++11     |
+|      array      |            [src/array.h](src/array.h)            | completed |                   to do                   |  ......  |     STL C++11     |
+|       list       |                  src/list.h                  | completed |                   to do                   |  ......  |     STL C++11     |
+|      deque      |                  src/deque.h                  | completed |                   to do                   |  ......  |     STL C++11     |
+|      stack      |                  src/stack.h                  | completed |                   to do                   |  ......  |     STL C++11     |
+|      queue      |                  src/queue.h                  | completed |                   to do                   |  ......  |     STL C++11     |
+|  priority_queue  |             src/priority_queue.h             | completed |                   to do                   |  ......  |     STL C++11     |
+|       map       |                   src/map.h                   |   to do   |                  ......                  |  ......  |     STL C++11     |
+|  unordered_map  |              src/unordered_map.h              |   to do   |                  ......                  |  ......  |     STL C++11     |
+|       set       |                   src/set.h                   |   to do   |                  ......                  |  ......  |     STL C++11     |
+|  unordered_set  |              src/unordered_set.h              |   to do   |                  ......                  |  ......  |     STL C++11     |
+|      string      |                 src/string.h                 | completed |                   to do                   |  ......  |     STL C++11     |
+|   string_view   |               src/string_view.h               | completed |                   to do                   |  ......  |                  |
+|      bitset      |                 src/bitset.h                 |   to do   |                  ......                  |  ......  |                  |
+|    skip_list    |                src/skip_list.h                |   to do   |                  ......                  |  ......  |                  |
+|     avl_tree     |                src/avl_tree.h                |   to do   |                  ......                  |  ......  |                  |
+|      B_tree      |                 src/b_tree.h                 |   to do   |                  ......                  |  ......  |                  |
+|     b+_tree     |               src/bplus_tree.h               |   to do   |                  ......                  |  ......  |                  |
+|     rb_tree     |                 src/rb_tree.h                 |   to do   |                  ......                  |  ......  |                  |
 
 ### 项目代码目录
 
