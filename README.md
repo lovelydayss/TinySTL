@@ -81,7 +81,7 @@
 | type_traits      | [src/type_traits.h](src/type_traits.h)           | completed |  ......  |
 | algorithm        | [src/algorithm.h](src/algorithm.h)               |   to do   |  ......  |
 | initializer_list | [src/initializer_list.h](src/initializer_list.h) | completed |  ......  |
-| array            | [src/array.h](src/array.h)                       |   to do   |  ......  |
+| array            | [src/array.h](src/array.h)                       | completed |  ......  |
 
 ### 参考内容
 
@@ -96,3 +96,5 @@
 **2023-5-7** 首次更新，完成 iterator 功能模块，重新整理了项目文档   [git-commit](https://github.com/lovelydayss/mSTL/commit/5e332f85ee5d1d945539f4b8573431a74a81e10e)
 
 **2023-5-24** 完成 vector 功能模块测试   [git-commit](https://github.com/lovelydayss/mSTL/commit/52ea757ae88647d35bb71455a3c6ca7e86b0cf99)
+
+**2023-5-24** 完成 array 功能模块测试   [git-commit](https://github.com/lovelydayss/mSTL/commit/447db84fde564bf13660a8ea49612b8cb1a84728)
