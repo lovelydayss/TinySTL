@@ -8,6 +8,12 @@ target("test_vector")
     add_files("src/detail/alloc.cpp")
     add_files("test/test_vector.cpp")
 
+target("test_array")
+    set_kind("binary")
+    add_cxxflags("-g")
+    add_cxxflags("-std=c++20")
+    add_files("test/test_array.cpp")
+
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --

@@ -141,57 +141,57 @@ public:
 
 };
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator==(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator!=(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return !(lhs == rhs);
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator<(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(),
 	                                    rhs.end());
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator>(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return rhs < lhs;
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator<=(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return !(lhs > rhs);
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator>=(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return !(lhs < rhs);
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline void swap(array<T, N>& lhs, array<T, N>& rhs) {
 	lhs.swap(rhs);
 }
 
 /*
 
-template <typename T, size_t N, size_t Index>
+template <class T, size_t N, size_t Index>
 constexpr T& get(array<T, N>& arr) {
 	static_assert(Index < N);
 	return typename __array_traits<T, N>::S_ref(arr.M_elems, Index);
 }
 
-template <typename T, size_t N, size_t Index>
+template <class T, size_t N, size_t Index>
 constexpr const T& get(const array<T, N>& arr) {
 	static_assert(Index < N);
 	return typename __array_traits<T, N>::S_ref(arr.M_elems, Index);
 }
 
-template <typename T, size_t N, size_t Index>
+template <class T, size_t N, size_t Index>
 constexpr T&& get(array<T, N>&& arr) {
 	static_assert(Index < N);
 	return std::move(get<Index>(arr));
@@ -203,21 +203,27 @@ constexpr T&& get(array<T, N>&& arr) {
 
 // 静态版本
 // 数组 T[N]
-template <typename T, size_t N>
+template <class T, size_t N>
 struct _array_traits {
 	typedef T Type[N];
 
-	static constexpr T& static_ref(const Type& t, size_t pos) { return const_cast<T&>(t[pos]); }
-	static constexpr T* static_ptr(const Type& t) { return const_cast<T*>(t); }
+	static constexpr T& static_ref(const Type& t, size_t pos) noexcept {
+		return const_cast<T&>(t[pos]);
+	}
+	static constexpr T* static_ptr(const Type& t) noexcept {
+		return const_cast<T*>(t);
+	}
 };
 
 // 类模板部分特例化，处理空数组
-template <typename T>
+template <class T>
 struct _array_traits<T, 0> {
 	struct Type {};
 
-	static constexpr T& static_ref(const Type&, size_t) { return *static_cast<T*>(nullptr); }
-	static constexpr T* static_ptr(const Type&) { return nullptr; }
+	static constexpr T& static_ref(const Type&, size_t) noexcept {
+		return *static_cast<T*>(nullptr);
+	}
+	static constexpr T* static_ptr(const Type&) noexcept { return nullptr; }
 };
 
 template <class T, size_t N>
@@ -239,108 +245,136 @@ struct array {
 
 	// mem data
 	typedef _array_traits<T, N> AT_Type;
-	typename AT_Type::Type M_elems;
+	typename AT_Type::Type      M_elems;
 
 	///<- (construct)(destruct)(copy)(operator=) ......
-	/// 结构体无需此部分
+	/// 此处无需此部分
 
 	// Element access
-	constexpr reference at(size_type pos) {
-		return pos < N ? AT_Type::static_ref(M_elems, pos) : throw "out of range";
+	reference at(size_type pos) {
+		return pos < N ? AT_Type::static_ref(M_elems, pos)
+		               : throw "out of range";
 	}
-	constexpr const_reference at(size_type pos) const {
-		return pos < N ? AT_Type::static_ref(M_elems, pos) : throw "out of range";
+	const_reference at(size_type pos) const {
+		return pos < N ? AT_Type::static_ref(M_elems, pos)
+		               : throw "out of range";
 	}
-	constexpr reference operator[](size_type pos) {
+	reference operator[](size_type pos) {
 		return AT_Type::static_ref(M_elems, pos);
 	}
-	constexpr const_reference operator[](size_type pos) const {
+	const_reference operator[](size_type pos) const {
 		return AT_Type::static_ref(M_elems, pos);
 	}
-	constexpr reference front() { return *(begin()); }
-	constexpr const_reference front() const { return *(begin()); }
-	constexpr reference back() { return N ? *(end() - 1) : *end(); }
-	constexpr const_reference back() const { return N ? *(end() - 1) : *end(); }
+	reference       front() { return *(begin()); }
+	const_reference front() const { return AT_Type::static_ref(M_elems, 0); }
+	reference       back() { return N ? *(end() - 1) : *end(); }
+	const_reference back() const {
+		return N ? AT_Type::static_ref(M_elems, N - 1)
+		         : AT_Type::static_ref(M_elems, 0);
+	}
 
-	constexpr pointer data() { return AT_Type::static_ptr(M_elems); }
-	constexpr const_pointer data() const { return AT_Type::static_ptr(M_elems);}
+	pointer       data() { return AT_Type::static_ptr(M_elems); }
+	const_pointer data() const { return AT_Type::static_ptr(M_elems); }
 
 	// Iterators
-	constexpr iterator begin() { return  static_cast<iterator>(data()); }
-	constexpr const_iterator cbegin() const { return  static_cast<const_iterator>(data()); }
-	constexpr iterator end() { return  static_cast<iterator>(data() + N); }
-	constexpr const_iterator cend() const { return  static_cast<const_iterator>(data() + N); }
+	iterator       begin() { return static_cast<iterator>(data()); }
+	const_iterator cbegin() const {
+		return static_cast<const_iterator>(data());
+	}
+	iterator       end() { return static_cast<iterator>(data() + N); }
+	const_iterator cend() const {
+		return static_cast<const_iterator>(data() + N);
+	}
 
-	constexpr reverse_iterator rbegin() { return static_cast<reverse_iterator>(data() + N); }
-	constexpr const_reverse_iterator crbegin() const { return static_cast<const_reverse_iterator>(data() + N); }
-	constexpr reverse_iterator rend() { return static_cast<reverse_iterator>(data()); }
-	constexpr const_reverse_iterator crend() const { return static_cast<const_reverse_iterator>(data()); }
-
+	reverse_iterator rbegin() {
+		return static_cast<reverse_iterator>(data() + N - 1);
+	}
+	const_reverse_iterator crbegin() const {
+		return static_cast<const_reverse_iterator>(data() + N - 1);
+	}
+	reverse_iterator rend() {
+		return static_cast<reverse_iterator>(data() - 1);
+	}
+	const_reverse_iterator crend() const {
+		return static_cast<const_reverse_iterator>(data() - 1);
+	}
 
 	// Capacity
-	constexpr bool empty() const { return size() == 0; }
+	constexpr bool      empty() const { return size() == 0; }
 	constexpr size_type size() const { return N; }
 	constexpr size_type max_size() const { return N; }
 
 	// Operations
-	void fill(reference value) { mSTL::fill_n(begin(), N, value);}
-	void swap(array& other) noexcept { mSTL::swap_ranges(begin(), end(), other.begin());}
-
+	void fill(const_reference value) { mSTL::fill_n(begin(), N, value); }
+	void swap(array& other) noexcept {
+		mSTL::swap_ranges(begin(), end(), other.begin());
+	}
 };
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator==(const array<T, N>& lhs, const array<T, N>& rhs) {
-	return mSTL::equal(lhs.begin(), lhs.end(), rhs.begin());
+	for (size_t i = 0; i < N; ++i) {
+		if (lhs[i] != rhs[i])
+			return false;
+	}
+
+	return true;
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator!=(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return !(lhs == rhs);
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator<(const array<T, N>& lhs, const array<T, N>& rhs) {
-	return mSTL::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	for (size_t i = 0; i < N; ++i) {
+		if (lhs[i] > rhs[i])
+			return false;
+		else if (lhs[i] < rhs[i])
+			return true;
+	}
+
+	return false;
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator>(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return rhs < lhs;
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator<=(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return !(lhs > rhs);
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline bool operator>=(const array<T, N>& lhs, const array<T, N>& rhs) {
 	return !(lhs < rhs);
 }
 
-template <typename T, size_t N>
+template <class T, size_t N>
 inline void swap(array<T, N>& lhs, array<T, N>& rhs) {
 	lhs.swap(rhs);
 }
 
-template <typename T, size_t N, size_t Index>
-constexpr T& get(array<T, N>& arr) {
+template <size_t Index, class T, size_t N>
+T& get(mSTL::array<T, N>& arr) {
 	static_assert(Index < N, "out of range");
 	return typename _array_traits<T, N>::static_ref(arr.M_elems, Index);
 }
 
-template <typename T, size_t N, size_t Index>
-constexpr const T& get(const array<T, N>& arr) {
+template <size_t Index, typename T, size_t N>
+const T& get(const mSTL::array<T, N>& arr) {
 	static_assert(Index < N, "out of range");
 	return typename _array_traits<T, N>::static_ref(arr.M_elems, Index);
 }
 
-template <typename T, size_t N, size_t Index>
-constexpr T&& get(array<T, N>&& arr) {
+template <size_t Index, class T, size_t N>
+const T&& get(const mSTL::array<T, N>&& arr) {
 	static_assert(Index < N, "out of range");
 	return std::move(get<Index>(arr));
 }
-
 
 MSTL_NAMESPACE_END
 

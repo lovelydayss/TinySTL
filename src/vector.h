@@ -1,11 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <cassert>
-#include <cstddef>
-#include <iterator>
-#include <limits>
-
 #include "basic.h"
 
 #include "algorithm.h"
@@ -14,6 +9,7 @@
 #include "type_traits.h"
 
 #include <initializer_list>
+#include <limits>
 #include <utility>
 
 MSTL_NAMESPACE_BEGIN
@@ -31,9 +27,6 @@ public:
 	using pointer = value_type*;
 	using const_pointer = const value_type*;
 
-	// using iterator = _iterator<random_access_iterator_tag, value_type>;
-	// using const_iterator = _iterator<random_access_iterator_tag, const value_type>;
-
 	using iterator = value_type*;
 	using const_iterator = const value_type*;
 
@@ -50,7 +43,7 @@ private:
 
 public:
 	// (construct)(destruct)(copy)(operator=)(assign) ......
-	// 不支持构造函数中自定义 alloc 进行分配，均采用类型默认 allocator
+	// 不支持构造函数中自定义 alloc 进行分配，均采用类型默认分配器
 
 	vector()
 	    : start_(nullptr)
@@ -146,7 +139,7 @@ public:
 		start_ = finish_ = end_of_storage_ = nullptr;
 	}
 
-	// allocator_type get_allocator() { return allocator_type(); }
+	allocator_type get_allocator() { return allocator_type(); }
 
 	// Element access
 
@@ -316,14 +309,15 @@ public:
 		size_type old_size = size();
 		size_type old_capacity = capacity();
 
+		size_type count_of_insert = count - old_size;
 		if (count < old_size) {
 			allocator_type::destroy((start_ + count), finish_);
 		} else if (count > old_size && count <= old_capacity) {
-			uninitialized_mem_func_type::fill_n(finish_, (count - old_size),
+			uninitialized_mem_func_type::fill_n(finish_, count_of_insert,
 			                                    value);
 		} else if (count > old_capacity) {
-			realloc_and_move(get_new_capacity(count));
-			uninitialized_mem_func_type::fill_n(finish_, (count - old_size),
+			realloc_and_move(get_new_capacity(count_of_insert));
+			uninitialized_mem_func_type::fill_n(finish_, count_of_insert,
 			                                    value);
 		}
 
@@ -339,23 +333,16 @@ public:
 		mSTL::swap(end_of_storage_, other.end_of_storage_);
 	}
 
-private:
-	inline size_type get_new_capacity(size_type len) const;
+public:
+	inline size_type get_new_capacity(size_type count) const;
 
+private:
 	inline void alloc_n_and_copy(const_iterator first, const_iterator last,
 	                             size_type count);
 	inline void realloc_and_move(size_type count);
 
 	inline void make_empty_before_pos(pointer pos, size_type count);
 	inline void erase_empty_in_pos(pointer pos, size_type count);
-
-	/*
-	inline void memmove_aux(pointer dest, pointer src, size_type count,
-	                        _true_type, _common_direction);
-	inline void memmove_aux(pointer dest, pointer src, size_type count,
-	                        _true_type, _reverse_direction);
-	
-*/
 
 	inline void memmove_aux(pointer dest, pointer src, size_type count,
 	                        _true_type, _direction);
@@ -365,8 +352,6 @@ private:
 	inline void memmove_aux(pointer dest, pointer src, size_type count,
 	                        _false_type, _reverse_direction);
 };
-
-// 此处就简单采用循环比较实现了
 
 template <class T, class Alloc>
 bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
@@ -403,21 +388,12 @@ bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
 
 template <class T, class Alloc>
 bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
-	return !(lhs > rhs);
+	return !(rhs < lhs);
 }
 
 template <class T, class Alloc>
 bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
-	size_t min_size = mSTL::min(lhs.size(), rhs.size());
-
-	for (size_t i = 0; i < min_size; ++i) {
-		if (lhs[i] < rhs[i])
-			return false;
-		else if (lhs[i] > rhs[i])
-			return true;
-	}
-
-	return lhs.size() > rhs.size() ? true : false;
+	return rhs < lhs;
 }
 
 template <class T, class Alloc>
@@ -429,9 +405,6 @@ template <class T, class Alloc>
 void swap(vector<T, Alloc>& lhs, vector<T, Alloc>& rhs) {
 	lhs.swap(rhs);
 }
-
-// 此处标准库实现似乎具有更好的性能
-// C++20 进行支持
 
 template <class T, class Alloc, class U>
 size_t erase(vector<T, Alloc>& c, const U& value) {
@@ -445,7 +418,6 @@ size_t erase(vector<T, Alloc>& c, const U& value) {
 
 	return count;
 }
-
 
 /*
 template <class T, class Alloc, class Pred>
@@ -477,18 +449,24 @@ size_t erase_if(vector<T, Alloc>& c, Pred pred) {
 
 ///<- private function
 
+// 此处可自定义增长策略
+// 测试可发现 std::vector 采用的并不是严格双倍的增长策略
 template <class T, class Alloc>
 inline typename vector<T, Alloc>::size_type
-vector<T, Alloc>::get_new_capacity(size_type len) const {
-	/*
+vector<T, Alloc>::get_new_capacity(size_type count) const {
+
 	size_type old_capacity = capacity();
 
-	size_type new_capacity = old_capacity + mSTL::max(old_capacity, len);
+	size_type new_capacity = old_capacity + mSTL::max(old_capacity, count);
 	assert(new_capacity < max_size());
 
-	return (old_capacity == 0 ? len : new_capacity);
-*/
-	return (capacity() == 0 ? len : capacity() * 2);
+	return (old_capacity == 0 ? count : new_capacity);
+
+	// gcc
+	// return (capacity() == 0 ? len : capacity() * 2);
+
+	// msvc
+	// return (capacity() == 0 ? len : static_cast<size_type>(capacity() * 1.5));
 }
 
 template <class T, class Alloc>
@@ -540,7 +518,7 @@ inline void vector<T, Alloc>::make_empty_before_pos(pointer   pos,
 		finish_ = start_ + new_size;
 	} else {
 
-		size_type new_capacity = get_new_capacity(new_size);
+		size_type new_capacity = get_new_capacity(count);
 		// 构建新的内存块
 		pointer new_start_ = allocator_type::allocate(new_capacity);
 
@@ -571,23 +549,6 @@ inline void vector<T, Alloc>::erase_empty_in_pos(pointer pos, size_type count) {
 	memmove_aux(pos, dest, size_move, isPODType(), _common_direction());
 	finish_ = pos + size_move;
 }
-
-/*
-template <class T, class Alloc>
-inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
-                                          size_type count, _true_type,
-                                          _common_direction) {
-	memmove(dest, src, count * sizeof(value_type));
-}
-
-template <class T, class Alloc>
-inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,
-                                          size_type count, _true_type,
-                                          _reverse_direction) {
-	memmove(dest, src, count * sizeof(value_type));
-}
-
-*/
 
 template <class T, class Alloc>
 inline void vector<T, Alloc>::memmove_aux(pointer dest, pointer src,

@@ -15,19 +15,35 @@ template <class T>
 using std_vector = std::vector<T>;
 using string = std::string;
 
-TEST_CASE(" test construct vector()") {
+TEST_CASE(" construct vector()") {
 
-	m_vector<string>   empty_m;
-	std_vector<string> empty;
+	///<- string
 
-	CHECK_EQ(empty_m.data(), nullptr);
-	CHECK_EQ(empty_m.data(), empty.data());
+	m_vector<string>   mvector_s;
+	std_vector<string> stdvector_s;
 
-	CHECK_EQ(empty_m.size(), empty.size());
-	CHECK_EQ(empty_m.capacity(), empty.capacity());
+	CHECK_EQ(mvector_s.data(), nullptr);
+	CHECK_EQ(mvector_s.data(), stdvector_s.data());
 
-	CHECK_EQ(empty.capacity(), 0);
-	CHECK_EQ(empty.size(), 0);
+	CHECK_EQ(mvector_s.size(), stdvector_s.size());
+	CHECK_EQ(mvector_s.capacity(), stdvector_s.capacity());
+
+	CHECK_EQ(stdvector_s.capacity(), 0);
+	CHECK_EQ(stdvector_s.size(), 0);
+
+	///<- int
+
+	m_vector<int>   mvector_i;
+	std_vector<int> stdvector_i;
+
+	CHECK_EQ(mvector_i.data(), nullptr);
+	CHECK_EQ(mvector_i.data(), stdvector_i.data());
+
+	CHECK_EQ(mvector_i.size(), stdvector_i.size());
+	CHECK_EQ(mvector_i.capacity(), stdvector_i.capacity());
+
+	CHECK_EQ(stdvector_i.capacity(), 0);
+	CHECK_EQ(stdvector_i.size(), 0);
 }
 
 TEST_CASE(" test vector(const size_type count, value_type()) ") {
@@ -806,7 +822,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_s.push_back("assdfgg");
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 	}
 
 	string tmp_s = "assdfgg";
@@ -816,7 +832,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_s.push_back(tmp_s);
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 	}
 
 	for (int i = 0; i < 20; ++i)
@@ -827,7 +843,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_s.pop_back();
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 	}
 
 	CHECK(mvec_s.empty());
@@ -838,7 +854,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_s.emplace_back(string("assdfgg"));
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 	}
 
 	for (int i = 0; i < 20; ++i)
@@ -850,7 +866,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_s.resize(i);
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		for (int j = 0; j < mvec_s.size(); j += 10)
 			CHECK_EQ(mvec_s[j], stdvec_s[j]);
@@ -861,7 +877,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_s.resize(i);
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		for (int j = 0; j < mvec_s.size(); j += 10)
 			CHECK_EQ(mvec_s[j], stdvec_s[j]);
@@ -880,7 +896,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_i.push_back(12);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 	}
 
 	int tmp_i = 12;
@@ -890,7 +906,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_i.push_back(tmp_i);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 	}
 
 	CHECK_EQ(mvec_i.size(), 20);
@@ -903,7 +919,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_i.pop_back();
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 	}
 
 	CHECK(mvec_i.empty());
@@ -914,7 +930,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_i.emplace_back();
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 	}
 
 	for (int i = 0; i < 20; ++i)
@@ -926,7 +942,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_i.resize(i);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		for (int j = 0; j < mvec_i.size(); j += 10)
 			CHECK_EQ(mvec_i[j], stdvec_i[j]);
@@ -937,7 +953,7 @@ TEST_CASE(" push_back && pop_back && emplace_back && resize ") {
 		mvec_i.resize(i);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		for (int j = 0; j < mvec_i.size(); j += 10)
 			CHECK_EQ(mvec_i[j], stdvec_i[j]);
@@ -958,7 +974,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_2 = mvec_s.insert((mvec_s.begin() + i), "f");
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -972,7 +988,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_2 = mvec_s.insert((mvec_s.begin() + i), m_s);
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -987,7 +1003,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		    mvec_s.insert((mvec_s.begin() + i), static_cast<size_t>(2), m_s);
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1004,7 +1020,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		                           stdvec_s_tmp.end());
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1017,7 +1033,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_2 = mvec_s.insert((mvec_s.begin() + i), {"1", "2", "3"});
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1033,7 +1049,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_4 = mvec_s.emplace((mvec_s.begin() + i), m_s);
 
 		CHECK_EQ(mvec_s.size(), stdvec_s.size());
-		// WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
+		WARN_EQ(mvec_s.capacity(), stdvec_s.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 		CHECK_EQ(*t_s_3, *t_s_4);
@@ -1068,7 +1084,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_2 = mvec_i.insert((mvec_i.begin() + i), 6);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1082,7 +1098,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_2 = mvec_i.insert((mvec_i.begin() + i), m_i);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1097,7 +1113,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		    mvec_i.insert((mvec_i.begin() + i), static_cast<size_t>(2), m_i);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1114,7 +1130,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		                           stdvec_i_tmp.end());
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1127,7 +1143,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_2 = mvec_i.insert((mvec_i.begin() + i), {1, 2, 3});
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 	}
@@ -1143,7 +1159,7 @@ TEST_CASE(" insert && earse && emplace ") {
 		auto t_s_4 = mvec_i.emplace((mvec_i.begin() + i), m_i);
 
 		CHECK_EQ(mvec_i.size(), stdvec_i.size());
-		// WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
+		WARN_EQ(mvec_i.capacity(), stdvec_i.capacity());
 
 		CHECK_EQ(*t_s_1, *t_s_2);
 		CHECK_EQ(*t_s_3, *t_s_4);
@@ -1339,5 +1355,4 @@ TEST_CASE(" others(earse earse_if) ") {
 }
 #endif
 
-// come from TinySTL
 MSTL_TEST_NAMESPACE_END
