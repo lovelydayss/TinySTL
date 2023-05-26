@@ -30,6 +30,11 @@ private:
 
 public:
 	initializer_list() noexcept = default;
+
+	// initializer_list 使用 {} 的构造方法需要编译器的支持
+	// 此处使用可变参数模板简单实现，不支持 {{}} 嵌套构造实现
+	// 后续组件实现过程中使用的也是 std::initializer_list
+	
 	template <class... Args>
 	constexpr initializer_list(Args... args) {
 		size_type size = static_cast<size_type>(sizeof...(args));
@@ -40,6 +45,7 @@ public:
 
 		int arr[] = {(set_arg((first_ + count++), args), 0)...};
 	}
+
 
 	initializer_list(const initializer_list<T>& other) = delete;
 	initializer_list<T>& operator=(const initializer_list<T>& other) = delete;
