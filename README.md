@@ -4,92 +4,83 @@
 
 ## 支持功能
 
-### 基本组件
+### 基础组件
 
-|          功能/组件          |                   路径                   | 完成情况 |  线程安全支持  |            单元测试            | 性能对比 |  组件来源参考  |
-| :--------------------------: | :---------------------------------------: | :-------: | :------------: | :----------------------------: | :-------: | :-------------: |
-|          allocator          |        [allocator.h](src/allocator.h)        | completed |     ......     |             ......             |  ......  | STL<br />C++11 |
-|         type_traits         |      [type_traits.h](src/type_traits.h)      | completed |     ......     |             ......             |  ......  | STL<br />C++11 |
-|           iterator           |         [iterator.h](src/iterator.h)         | completed |     ......     |             ......             |  ......  | STL<br />C++11 |
-|          algorithm          |        [algorithm.h](src/algorithm.h)        | completed |     ......     |             to do             |  ......  | STL<br />C++11 |
-|       initializer_list       | [initializer_list.h](src/initializer_list.h) | completed |     ......     |             ......             |  ......  | STL<br /> C++11 |
-|             pair             |                  pair.h                  | completed |     ......     |             to do             |   to do   | STL<br />C++11 |
-|            tuple            |                  tuple.h                  | completed |     ......     |             to do             |   to do   | STL<br />C++11 |
-|            array            |            [array.h](src/array.h)            | completed |   mt_array.h   | [completed](test/test_array.cpp) | completed | STL<br />C++11 |
-|            vector            |           [vector.h](src/vector.h)           | completed |     ......     | [completed](test/test_vector.cpp) | completed | STL<br />C++11 |
-|           fbvector           |                fbvector.h                |   to do   |     ......     |             ......             |  ......  |     ......     |
-|             span             |                  span.h                  |   to do   |     ......     |             ......             |  ......  | STL<br />C++20 |
-|             list             |                  list.h                  | completed |   mt_list.h   |             to do             |   to do   | STL<br />C++11 |
-|         forward_list         |              forward_list.h              | completed |                |             to do             |   to do   | STL<br />C++11 |
-|       circular buffer       |             circular_buffer.h             | completed |     ......     |             to do             |   to do   |     ......     |
-|         suffix array         |              suffix_array.h              |   to do   |     ......     |             ......             |  ......  |     ......     |
-|            deque            |                  deque.h                  | completed |     ......     |             to do             |   to do   | STL<br />C++11 |
-|            stack            |                  stack.h                  | completed |     ......     |             to do             |   to do   | STL<br />C++11 |
-|            queue            |                  queue.h                  | completed |     ......     |             to do             |   to do   | STL<br />C++11 |
-|        priority_queue        |             priority_queue.h             | completed |     ......     |             to do             |   to do   |  STL<br />C++1  |
-|         disjoint set         |              disjoint_set.h              | completed |     ......     |             to do             |   to do   |     ......     |
-|         map/multimap         |                   map.h                   |   to do   |     ......     |             ......             |  ......  | STL<br />C++11 |
-| unordered_<br />map/multimap |              unordered_map.h              |   to do   |     ......     |             ......             |  ......  | STL<br />C++11 |
-|         set/multiset         |                   set.h                   |   to do   |     ......     |             ......             |  ......  | STL<br />C++11 |
-| unordered_<br />set/multiset |              unordered_set.h              |   to do   |     ......     |             ......             |  ......  | STL<br />C++11 |
-|            string            |                 string.h                 | completed |     ......     |             to do             |  ......  | STL<br />C++11 |
-|           fbstring           |                fbstring.h                | completed |     ......     |             to do             |  ......  |      folly      |
-|         string_view         |               string_view.h               | completed |     ......     |             to do             |  ......  | STL<br />C++17 |
-|            bitmap            |                 bitmap.h                 |   to do   |     ......     |             ......             |  ......  |     ......     |
-|          skip_list          |                skip_list.h                | completed | mt_skip_list.h |             to do             |  ......  |      redis      |
-|           avl_tree           |                avl_tree.h                |   to do   |     ......     |             ......             |  ......  |     ......     |
-|            b_tree            |                 b_tree.h                 |   to do   |     ......     |             ......             |  ......  |     ......     |
-|           b+_tree           |               bplus_tree.h               |   to do   |     ......     |             ......             |  ......  |     ......     |
-|           rb_tree           |                 rb_tree.h                 |   to do   |     ......     |             ......             |  ......  |     ......     |
-|          trie tree          |                trie_tree.h                |   to do   |     ......     |             ......             |  ......  |     ......     |
-|            graph            |                  graph.h                  |   to do   |     ......     |             ......             |  ......  |     ......     |
+|    功能/组件    |                   路径                   | 完成情况 | 单元测试 |  组件来源参考  |
+| :--------------: | :---------------------------------------: | :-------: | :------: | :-------------: |
+|    allocator    |        [allocator.h](src/allocator.h)        | completed |  ......  | STL<br />C++11 |
+|   type_traits   |      [type_traits.h](src/type_traits.h)      | completed |  ......  | STL<br />C++11 |
+|     iterator     |         [iterator.h](src/iterator.h)         | completed |  ......  | STL<br />C++11 |
+|    algorithm    |        [algorithm.h](src/algorithm.h)        | completed |  to do  | STL<br />C++11 |
+| initializer_list | [initializer_list.h](src/initializer_list.h) | completed |  ......  | STL<br /> C++11 |
 
-### 线程安全相关
+### 容器及相关组件
+
+|          功能/组件          |               路径               | 完成情况 |  线程安全支持  |            单元测试            | 性能对比 | 组件来源参考<br />开发版本 |
+| :--------------------------: | :-------------------------------: | :-------: | :------------: | :----------------------------: | :-------: | :------------------------: |
+|             pair             |              pair.h              | completed |     ......     |             to do             |   to do   |       STL<br />C++11       |
+|            tuple            |              tuple.h              | completed |     ......     |             to do             |   to do   |       STL<br />C++11       |
+|            array            |        [array.h](src/array.h)        | completed |   mt_array.h   | [completed](test/test_array.cpp) | completed |       STL<br />C++11       |
+|            vector            |       [vector.h](src/vector.h)       | completed |     ......     | [completed](test/test_vector.cpp) | completed |       STL<br />C++11       |
+|             span             |              span.h              |   to do   |     ......     |             ......             |  ......  |       STL<br />C++20       |
+|             list             |         [list.h](src/list.h)         | completed |   mt_list.h   |           completed           |   to do   |       STL<br />C++11       |
+|         forward_list         | [forward_list.h](src/forward_list.h) | completed |                |           completed           |   to do   |       STL<br />C++11       |
+|       circular buffer       |         circular_buffer.h         | completed |     ......     |             to do             |   to do   |           ......           |
+|         suffix array         |          suffix_array.h          |   to do   |     ......     |             ......             |  ......  |           ......           |
+|            deque            |        [deque.h](src/deque.h)        | completed |     ......     |           completed           |   to do   |       STL<br />C++11       |
+|            stack            |        [stack.h](src/stack.h)        | completed |     ......     |           completed           |   to do   |       STL<br />C++11       |
+|            queue            |        [queue.h](src/queue.h)        | completed |     ......     |           completed           |   to do   |       STL<br />C++11       |
+|        priority_queue        |         priority_queue.h         | completed |     ......     |             to do             |   to do   |       STL<br />C++11       |
+|         disjoint set         |          disjoint_set.h          | completed |     ......     |             to do             |   to do   |           ......           |
+|         map/multimap         |               map.h               |   to do   |     ......     |             ......             |  ......  |       STL<br />C++11       |
+| unordered_<br />map/multimap |          unordered_map.h          |   to do   |     ......     |             ......             |  ......  |       STL<br />C++11       |
+|         set/multiset         |               set.h               |   to do   |     ......     |             ......             |  ......  |       STL<br />C++11       |
+| unordered_<br />set/multiset |          unordered_set.h          |   to do   |     ......     |             ......             |  ......  |       STL<br />C++11       |
+|    string/<br />fbstring    |       [string.h](src/string.h)       | completed |     ......     |           completed           |  ......  |    STL/folly<br />C++11    |
+|         string_view         |  [string_view.h](src/string_view.h)  | completed |     ......     |           completed           |  ......  |    STL/folly<br />C++17    |
+|            bitmap            |             bitmap.h             |   to do   |     ......     |             ......             |  ......  |           ......           |
+|          skip_list          |            skip_list.h            | completed | mt_skip_list.h |             to do             |  ......  |      redis<br />C++11      |
+|           avl_tree           |            avl_tree.h            |   to do   |     ......     |             ......             |  ......  |           ......           |
+|            b_tree            |             b_tree.h             |   to do   |     ......     |             ......             |  ......  |           ......           |
+|           b+_tree           |           bplus_tree.h           |   to do   |     ......     |             ......             |  ......  |           ......           |
+|           rb_tree           |             rb_tree.h             |   to do   |     ......     |             ......             |  ......  |       STL<br />C++11       |
+|          trie tree          |            trie_tree.h            |   to do   |     ......     |             ......             |  ......  |           ......           |
+|            graph            |              graph.h              |   to do   |     ......     |             ......             |  ......  |           ......           |
+
+### 线程安全相关组件
 
 |    功能/组件    |         路径         | 完成情况 | 单元测试 | 性能对比 | 功能/组件来源参考 |
 | :-------------: | :------------------: | :-------: | :------: | :------: | :---------------: |
 |    spin_lock    |    src/spinlock.h    | completed |  ......  |  ......  |       folly       |
 | lock-free queue | src/lockfree_queue.h | completed |  ......  |  ......  |       folly       |
 
-### 工具列表
+## 项目开发支持
 
-| 工具名称 | 工具简介                | 项目目标位置                                       |
-| -------- | ----------------------- | -------------------------------------------------- |
-| doctest  | a test framework      | [doctest/doctest](https://github.com/doctest/doctest) |
-| xmake    | c++ compiler framework | [xmake-io/xmake](https://github.com/xmake-io/xmake)   |
+### 各组件文档
 
-## 项目支持
+| 名称        | 路径                                           | 组件功能简介                       |
+| ----------- | ---------------------------------------------- | ---------------------------------- |
+| memory      | [doc/memory](doc/memory/memory.md)                | C++ 内存管理及 std::alloc 源码解析 |
+| iterator    | [doc/iterator](doc/iterator/iterator.md)          | C++ 迭代器原理及源码解析           |
+| type_traits | [doc/type_traits](doc/type_traits/type_traits.md) | C++ 类型萃取原理及应用             |
+| vector      | [doc/vector](doc/vector/vector.md)                | vector/array/initializer_list 文档 |
 
-### 组件文档及知识总结
+### 项目工具列表
 
-| 名称        | 简介                               | 路径                                           |
-| ----------- | ---------------------------------- | ---------------------------------------------- |
-| memory      | C++ 内存管理及 std::alloc 源码解析 | [doc/memory](doc/memory/memory.md)                |
-| iterator    | C++ 迭代器原理及源码解析           | [doc/iterator](doc/iterator/iterator.md)          |
-| type_traits | C++ 类型萃取原理及应用             | [doc/type_traits](doc/type_traits/type_traits.md) |
-| vector      | vector/array/initializer_list 文档 | [doc/vector](doc/vector/vector.md)                |
+| 工具名称 | 路径                                               | 工具简介                |
+| -------- | -------------------------------------------------- | ----------------------- |
+| doctest  | [doctest/doctest](https://github.com/doctest/doctest) | a test framework      |
+| xmake    | [xmake-io/xmake](https://github.com/xmake-io/xmake)   | c++ compiler framework |
 
-### 项目代码结构
+### 参考资料
 
-| 代码文件         | 路径                                          | 完成情况 | 文件功能 |
-| ---------------- | --------------------------------------------- | :-------: | :------: |
-| allocator        | [src/allocator.h](src/allocator.h)               | completed |  ......  |
-| iterator         | [src/iterator.h](src/iterator.h)                 | completed |  ......  |
-| vector           | [src/vector.h](src/vector.h)                     |   to do   |  ......  |
-| construct        | [src/construct.h](src/construct.h)               | completed |  ......  |
-| uninitialized    | [src/uninitialized.h](src/uninitialized.h)       | completed |  ......  |
-| type_traits      | [src/type_traits.h](src/type_traits.h)           | completed |  ......  |
-| algorithm        | [src/algorithm.h](src/algorithm.h)               |   to do   |  ......  |
-| initializer_list | [src/initializer_list.h](src/initializer_list.h) | completed |  ......  |
-| array            | [src/array.h](src/array.h)                       | completed |  ......  |
-
-### 参考内容
-
-[cppreference](https://en.cppreference.com/w/)
-
-[TinySTL](https://github.com/zouxiaohang/TinySTL/tree/master/TinySTL)
-
-侯捷《STL 源码剖析》，《C++ Primer》...
+|   参考资料名称   |                                路径                                | 参考资料简介                     |
+| :--------------: | :----------------------------------------------------------------: | -------------------------------- |
+|   cppreference   |            [cppreference](https://en.cppreference.com/w/)            | doc of cpp language              |
+|     TinySTL     | [TinySTL](https://github.com/zouxiaohang/TinySTL/tree/master/TinySTL) | a tiny standard template library |
+|  Facebook folly  |          [facebook/folly](https://github.com/facebook/folly)          | Facebook folly standard library  |
+| 《STL 源码剖析》 |                               ......                               | 侯捷《STL 源码剖析》             |
+|  《C++ Primer》  |                               ......                               | 《C++ Primer》                   |
 
 ## 更新记录
 

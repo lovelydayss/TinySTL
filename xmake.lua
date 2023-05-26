@@ -11,7 +11,7 @@ target("test_vector")
 target("test_array")
     set_kind("binary")
     add_cxxflags("-g")
-    add_cxxflags("-std=c++20")
+    -- add_cxxflags("-std=c++20")
     add_files("test/test_array.cpp")
 
 --
