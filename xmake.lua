@@ -14,6 +14,55 @@ target("test_array")
     -- add_cxxflags("-std=c++20")
     add_files("test/test_array.cpp")
 
+target("test_list")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_list.cpp")
+
+target("test_forward_list")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_forward_list.cpp")
+
+target("test_deque")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_deque.cpp")
+
+target("test_stack")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_stack.cpp")
+
+target("test_queue")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_queue.cpp")
+
+target("test_string")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_string.cpp")
+
+target("test_string_view")
+    set_kind("binary")
+    add_cxxflags("-g")
+    -- add_cxxflags("-std=c++2a")
+    add_files("src/detail/alloc.cpp")
+    add_files("test/test_string_view.cpp")
+
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --
